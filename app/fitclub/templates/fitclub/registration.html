@@ -1,0 +1,13 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+{% load crispy_forms_tags %}
+
+<!--Register--> 
+<div class="container py-5">
+	<h1>Регистрация</h1>
+	<form method="POST">
+		{% csrf_token %}
+		{{ register_form|crispy }}                    
+		<button class="btn btn-primary" type="submit">Заригестрироваться</button>
+	</form>
+	<p class="text-center">Если у Вас уже есть акаунт, перейдите к <a href="/login">входу</a>.</p>
+</div>
