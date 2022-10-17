@@ -55,3 +55,6 @@ def admin_users(request):
 
     return render(request=request, template_name="fitclub/users.html", context={'users': users})
 
+
+def user_info(request, id):
+    return HttpResponse(f"<h1>Hi, {id}!</h1>")

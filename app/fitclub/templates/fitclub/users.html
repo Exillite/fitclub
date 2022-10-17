@@ -25,13 +25,13 @@
             </thead>
             <tbody>
 
-
+            {% for user in users %}
             <tr>
-                <td>Larry</td>
-                <td>the Bird</td>
-                <td><a href="#link" class="btn-sm btn-primary" role="button">Редактировать</a></td>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.last_name }}</td>
+                <td><a href="{% url 'user' user.pk %}" class="btn-sm btn-primary" role="button">Редактировать</a></td>
             </tr>
-
+            {% endfor %}
 
             </tbody>
         </table>
