@@ -4,8 +4,16 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from .forms import NewUserForm
+from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
 from .models import *
+
+def ini(request):
+    group1 = Group(name = "admin")
+    group1.save()
+    group2 = Group(name = "trener")
+    group2.save()
+
 
 def index(request):
     if not request.user.is_authenticated:
@@ -57,4 +65,15 @@ def admin_users(request):
 
 
 def user_info(request, id):
-    return HttpResponse(f"<h1>Hi, {id}!</h1>")
+    User = get_user_model()
+    user = User.objects.get(pk=id)
+    return render(request=request, template_name="fitclub/user.html", context={'user': user})
+
+
+def admin_groups(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    groups = SportGroup.objects.all()
+
+    return render(request=request, template_name="fitclub/groups.html", context={'groups': groups})
