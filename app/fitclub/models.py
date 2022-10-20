@@ -1,6 +1,3 @@
-from itertools import count
-from multiprocessing import Event
-from tracemalloc import start
 from django.db import models
 from django.conf import settings
 
@@ -11,10 +8,7 @@ class SportGroup(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
-    trener = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-    )
+    count_clients = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -25,11 +19,11 @@ class GroupTime(models.Model):
     end = models.TimeField()
     day = models.IntegerField() # 1 - 7
 
-
     group = models.ForeignKey('SportGroup', on_delete=models.PROTECT, null=True)
     
     def __str__(self):
         return f"{self.group.name}: {self.start} - {self.end}"
+
 
 class Trening(models.Model):
     start = models.TimeField()
@@ -40,4 +34,9 @@ class Trening(models.Model):
     col = models.IntegerField()
     is_was = models.BooleanField() # Была ло занятие
     progul = models.BooleanField() # Был ли прогул
-    
+
+
+class Client(models.Model):
+    name = models.CharField(max_length=255)
+    surname = models.CharField(max_length=255)
+    group = models.ForeignKey('SportGroup', on_delete=models.PROTECT, null=True)

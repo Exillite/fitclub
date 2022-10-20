@@ -13,6 +13,8 @@ def ini(request):
     group1.save()
     group2 = Group(name = "trener")
     group2.save()
+    
+    return HttpResponse("OK")
 
 
 def index(request):

@@ -1,3 +1,7 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+admin.site.register(SportGroup)
+admin.site.register(GroupTime)
+admin.site.register(Trening)
+admin.site.register(Client)
