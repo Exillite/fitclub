@@ -1,7 +1,9 @@
+from unicodedata import name
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from .forms import NewUserForm
 from django.contrib.auth.models import User, Group
@@ -79,3 +81,22 @@ def admin_groups(request):
     groups = SportGroup.objects.all()
 
     return render(request=request, template_name="fitclub/groups.html", context={'groups': groups})
+
+@csrf_exempt
+def add_group(request):
+    if request.method == "POST":
+        data = request.POST
+        group_name = data.get("groupname")
+        
+        sport_group = SportGroup(name=group_name)
+        sport_group.save()
+        return redirect('groups')
+
+    return render(request=request, template_name="fitclub/addgroup.html")
+
+def group_info(request, id):
+    group = SportGroup.objects.get(pk=id)
+    User = get_user_model()
+    tereners = User.objects.filter(groups__name='trener')
+
+    return render(request=request, template_name="fitclub/group.html", context={'group': group, 'treners': tereners})

@@ -7,6 +7,7 @@ class SportGroup(models.Model):
     trener = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        null=True
     )
     count_clients = models.IntegerField(default=0)
 

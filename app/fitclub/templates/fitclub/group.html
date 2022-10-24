@@ -1,0 +1,64 @@
+{% extends 'fitclub/base.html' %}
+{% load static %}
+
+{% block content %}
+<form method="post">
+<button type="submit" class="float-right btn btn-lg btn-primary">Сохранить</button>
+<br>
+<br>
+<br>
+
+<div class="card">
+  <div class="card-body">
+    <div class="row align-items-center h-100">
+      <h1 class="col-auto d-flex ms-auto ms-md-0 text-lg">
+        {{ group.name }}
+      </h1>
+    </div>
+  </div>
+</div>
+
+<br>
+
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Тренер</a>
+    <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Участники</a>
+    <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Contact</a>
+  </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+  <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+    
+    {% if not group.trener %}
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="none" checked>
+      <label class="form-check-label" for="exampleRadios1">
+      Отсутствует
+      </label>
+    </div>
+    {% else %}
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="none">
+      <label class="form-check-label" for="exampleRadios1">
+      Отсутствует
+      </label>
+    </div>
+    {% endif %}
+    
+    {% for trener in treners %}
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="{{ trener.pk }}" {% if group.trener.pk == trener.pk %}checked{% endif %}>
+      <label class="form-check-label" for="exampleRadios1">
+      {{ trener.first_name }} {{ trener.last_name }}
+      </label>
+    </div>
+    {% endfor %}
+
+  </div>
+  <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">...</div>
+  <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>
+</div>
+</form>
+
+{% endblock %}
