@@ -29,34 +29,44 @@
 </nav>
 <div class="tab-content" id="nav-tabContent">
   <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-    
+    <br>
     {% if not group.trener %}
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="none" checked>
-      <label class="form-check-label" for="exampleRadios1">
+      <input class="form-check-input" type="radio" name="exampleRadios" id="rtrener" value="none" checked>
+      <label class="form-check-label" for="rtrener">
       Отсутствует
       </label>
     </div>
     {% else %}
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="none">
-      <label class="form-check-label" for="exampleRadios1">
+      <input class="form-check-input" type="radio" name="exampleRadios" id="rtrener" value="none">
+      <label class="form-check-label" for="rtrener">
       Отсутствует
       </label>
     </div>
     {% endif %}
-    
     {% for trener in treners %}
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="{{ trener.pk }}" {% if group.trener.pk == trener.pk %}checked{% endif %}>
-      <label class="form-check-label" for="exampleRadios1">
+      <input class="form-check-input" type="radio" name="exampleRadios" id="rtrener" value="{{ trener.pk }}" {% if group.trener.pk == trener.pk %}checked{% endif %}>
+      <label class="form-check-label" for="rtrener" style="font-size: 20px;">
       {{ trener.first_name }} {{ trener.last_name }}
       </label>
     </div>
     {% endfor %}
 
   </div>
-  <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">...</div>
+  <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+    <br>
+    <div class="list-group">
+      {% for cl in clients %}
+      <a href="{% url 'client' cl.pk %}" class="list-group-item list-group-item-action" style="font-size: 1.5em; margin-bottom: 5px;">{{ cl.name }} {{ cl.surname }}</a>
+      <a href="{% url 'client' cl.pk %}" class="list-group-item list-group-item-action" style="font-size: 1.5em; margin-bottom: 5px;">{{ cl.name }} {{ cl.surname }}</a>
+      <a href="{% url 'client' cl.pk %}" class="list-group-item list-group-item-action" style="font-size: 1.5em; margin-bottom: 5px;">{{ cl.name }} {{ cl.surname }}</a>
+      <a href="{% url 'client' cl.pk %}" class="list-group-item list-group-item-action" style="font-size: 1.5em; margin-bottom: 5px;">{{ cl.name }} {{ cl.surname }}</a>
+      {% endfor %}
+    </div>
+   
+  </div>
   <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>
 </div>
 </form>

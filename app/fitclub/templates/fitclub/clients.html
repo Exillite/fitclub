@@ -1,0 +1,28 @@
+{% extends 'fitclub/base.html' %}
+{% block content %}
+    <form action="get">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Имя</th>
+                <th scope="col">Фамилия</th>
+                <th scope="col">Фамилия</th>
+                <th scope="col">Редактировать</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for user in clients %}
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.surname }}</td>
+                <td>{{ user.group.name }}</td>
+                <td><a href="{% url 'client' user.pk %}" class="btn-sm btn-primary" role="button">Редактировать</a></td>
+            </tr>
+            {% endfor %}
+            
+            </tbody>
+        </table>
+    </form>
+
+{% endblock %}

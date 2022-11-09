@@ -94,9 +94,31 @@ def add_group(request):
 
     return render(request=request, template_name="fitclub/addgroup.html")
 
+@csrf_exempt
 def group_info(request, id):
+    if request.method == "POST":
+        data = request.POST
+        group_trener_pk = data.get("rtrener")
+
     group = SportGroup.objects.get(pk=id)
     User = get_user_model()
     tereners = User.objects.filter(groups__name='trener')
 
-    return render(request=request, template_name="fitclub/group.html", context={'group': group, 'treners': tereners})
+    clients = Client.objects.filter(groups=group.pk)
+
+    return render(request=request, template_name="fitclub/group.html", context={'group': group, 'treners': tereners, 'clients': clients})
+
+
+def admin_clients(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    clients = Client.objects.all()
+
+    return render(request=request, template_name="fitclub/clients.html", context={'clients': clients})
+
+
+def client_info(request, id):
+    client = Client.objects.get(pk=id)
+    groups = SportGroup.objects.all()
+    return render(request=request, template_name="fitclub/client.html", context={'user': client, 'gruops': groups})

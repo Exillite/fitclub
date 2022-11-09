@@ -9,7 +9,6 @@ class SportGroup(models.Model):
         on_delete=models.CASCADE,
         null=True
     )
-    count_clients = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -40,4 +39,6 @@ class Trening(models.Model):
 class Client(models.Model):
     name = models.CharField(max_length=255)
     surname = models.CharField(max_length=255)
-    group = models.ForeignKey('SportGroup', on_delete=models.PROTECT, null=True)
+    phone = models.CharField(max_length=255, null=True, blank=True)
+    email = models.CharField(max_length=255, null=True, blank=True)
+    groups = models.ManyToManyField(SportGroup)
