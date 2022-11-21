@@ -1,14 +1,13 @@
-from unicodedata import name
-from django.http import HttpResponse
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import Group, User
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render, redirect
 from .forms import NewUserForm
-from django.contrib.auth.models import User, Group
-from django.contrib.auth import get_user_model
 from .models import *
+
 
 def ini(request):
     group1 = Group(name = "admin")
@@ -20,6 +19,7 @@ def ini(request):
 
 
 def index(request):
+    
     if not request.user.is_authenticated:
         return redirect('login')
     return HttpResponse(f"<h1>Hi, {request.user}!</h1>")
@@ -96,12 +96,31 @@ def add_group(request):
 
 @csrf_exempt
 def group_info(request, id):
+    User = get_user_model()
     if request.method == "POST":
         data = request.POST
-        group_trener_pk = data.get("rtrener")
+        group = SportGroup.objects.get(pk=id)
+
+        group_trener_pk = data.get("new_trener")
+
+        if group_trener_pk == 'none':
+            if group.trener != None:
+                group.trener = None
+        else:
+            group_trener_pk = int(group_trener_pk)
+            if not group.trener or (group_trener_pk != group.trener.pk):
+                new_trener  = User.objects.get(pk=group_trener_pk)
+                group.trener = new_trener
+
+        group_name = data.get("groupname")
+        if group.name != group_name:
+            group.name = group_name
+
+
+        group.save()
+
 
     group = SportGroup.objects.get(pk=id)
-    User = get_user_model()
     tereners = User.objects.filter(groups__name='trener')
 
     clients = Client.objects.filter(groups=group.pk)
