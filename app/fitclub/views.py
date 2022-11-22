@@ -7,6 +7,7 @@ from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from .forms import NewUserForm
 from .models import *
+import datetime
 
 
 def ini(request):
@@ -113,9 +114,12 @@ def group_info(request, id):
                 group.trener = new_trener
 
         group_name = data.get("groupname")
+
         if group.name != group_name:
             group.name = group_name
 
+        if "addtime" in data:
+            return redirect('newtime', group_id=id)
 
         group.save()
 
@@ -141,3 +145,19 @@ def client_info(request, id):
     client = Client.objects.get(pk=id)
     groups = SportGroup.objects.all()
     return render(request=request, template_name="fitclub/client.html", context={'user': client, 'gruops': groups})
+
+@csrf_exempt
+def add_new_time(request, group_id):
+    group = SportGroup.objects.get(pk=group_id)
+
+    if request.method == "POST":
+        data = request.POST
+        ts = datetime.time(*(map(int, data['starttime'].split(':'))))
+        te = datetime.time(*(map(int, data['endtime'].split(':'))))
+        day_num = int(data['day'])
+
+        group_time = GroupTime(start=ts, end=te, day=day_num, group=group)
+        group_time.save()
+        return redirect('group', id=group_id)
+
+    return render(request=request, template_name="fitclub/new_time.html", context={'group': group})

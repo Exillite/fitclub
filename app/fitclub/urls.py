@@ -13,5 +13,6 @@ urlpatterns = [
     path('addgroup/', add_group, name='addgroup'),
     path('group/<int:id>', group_info, name="group"),
     path('clients/', admin_clients, name='clients'),
-    path('client/<int:id>', client_info, name='client')
+    path('client/<int:id>', client_info, name='client'),
+    path('newtime/<int:group_id>', add_new_time, name='newtime')
 ]
