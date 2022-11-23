@@ -60,23 +60,23 @@
 <form method="POST">
     <br>
     <br>
-    <h2>Добавить время для группы {{ group.name }}</h2>
+    <h2>Редактировать время для группы {{ group.name }}</h2>
     <br>
     <label for="timestart" style="font-size: 20px">Врмея начала</label>
-    <input name="starttime" id="timestart" type="time" required style="margin-right: 100px"/>
+    <input name="starttime" id="timestart" type="time" value="{{ start }}" required style="margin-right: 100px"/>
     <label for="timeend" style="font-size: 20px">Врмея окончания</label>
-    <input name="endtime" id="timeend" type="time" value="" required/>
+    <input name="endtime" id="timeend" type="time" value="{{ end }}" required/>
     <br>
     <label for="day" style="font-size: 20px">День недели</label>
     <select required name="day" id="day" class="form-control" style="font-size: 20px">
-        <option disabled selected value> -- Выберите день недели -- </option>
-        <option value="1">Понедельник</option>
-        <option value="2">Вторник</option>
-        <option value="3">Среда</option>
-        <option value="4">Четверг</option>
-        <option value="5">Пятница</option>
-        <option value="6">Суббота</option>
-        <option value="7">Воскресенье</option>
+        <option disabled value> -- Выберите день недели -- </option>
+        <option {% if day == "Понедельник" %}selected{% endif %} value="1">Понедельник</option>
+        <option {% if day == "Вторник" %}selected{% endif %} value="2">Вторник</option>
+        <option {% if day == "Среда" %}selected{% endif %} value="3">Среда</option>
+        <option {% if day == "Четверг" %}selected{% endif %} value="4">Четверг</option>
+        <option {% if day == "Пятница" %}selected{% endif %} value="5">Пятница</option>
+        <option {% if day == "Суббота" %}selected{% endif %} value="6">Суббота</option>
+        <option {% if day == "Воскресенье" %}selected{% endif %} value="7">Воскресенье</option>
     </select>
     <br>
     <button type="sybmit" class="btn btn-primary btn-lg">Добавить время</button>    

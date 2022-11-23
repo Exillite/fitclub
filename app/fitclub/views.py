@@ -10,6 +10,17 @@ from .models import *
 import datetime
 
 
+DAYS = [
+    '',
+    'Понедельник',
+    'Вторник',
+    'Среда',
+    'Четверг',
+    'Пятница',
+    'Суббота',
+    'Воскресенье'
+]
+
 def ini(request):
     group1 = Group(name = "admin")
     group1.save()
@@ -120,6 +131,9 @@ def group_info(request, id):
 
         if "addtime" in data:
             return redirect('newtime', group_id=id)
+        
+        if "edittime" in data:
+            return redirect('edittime', time_id=int(data['edittime']))
 
         group.save()
 
@@ -129,7 +143,13 @@ def group_info(request, id):
 
     clients = Client.objects.filter(groups=group.pk)
 
-    return render(request=request, template_name="fitclub/group.html", context={'group': group, 'treners': tereners, 'clients': clients})
+    times = GroupTime.objects.filter(group=group.pk).order_by('day')
+
+    days = []
+    for time in times:
+        days.append((DAYS[time.day], time))
+
+    return render(request=request, template_name="fitclub/group.html", context={'group': group, 'treners': tereners, 'clients': clients, 'days': days})
 
 
 def admin_clients(request):
@@ -161,3 +181,48 @@ def add_new_time(request, group_id):
         return redirect('group', id=group_id)
 
     return render(request=request, template_name="fitclub/new_time.html", context={'group': group})
+
+
+@csrf_exempt
+def edit_time(request, time_id):
+    time = GroupTime.objects.get(pk=time_id)
+    group = SportGroup.objects.get(pk=time.group.pk)
+
+    if request.method == "POST":
+        data = request.POST
+        ts = datetime.time(*(map(int, data['starttime'].split(':'))))
+        te = datetime.time(*(map(int, data['endtime'].split(':'))))
+        day_num = int(data['day'])
+
+        time.start = ts
+        time.end = te
+        time.day = day_num
+        time.save()
+
+        return redirect('group', id=group.pk)
+
+    ts = ""
+    if len(str(time.start.hour)) == 1:
+        ts += "0" + str(time.start.hour) + ":"
+    else:
+        ts += str(time.start.hour) + ":"
+
+    if len(str(time.start.minute)) == 1:
+        ts += "0" + str(time.start.minute)
+    else:
+        ts += str(time.start.minute)
+
+    te = ""
+    if len(str(time.end.hour)) == 1:
+        te += "0" + str(time.end.hour) + ":"
+    else:
+        te += str(time.end.hour) + ":"
+
+    if len(str(time.end.minute)) == 1:
+        te += "0" + str(time.end.minute)
+    else:
+        te += str(time.end.minute)
+    
+    d = DAYS[time.day]
+
+    return render(request=request, template_name="fitclub/edit_time.html", context={'group': group, 'start': ts, 'end': te, 'day': d})
