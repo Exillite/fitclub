@@ -29,22 +29,37 @@
     </div>
   </div>
 </div>
-
 <br>
 
 <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
     <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Группы</a>
     <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Занятия</a>
-    <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Contact</a>
-    <a class="nav-item nav-link" id="nav-settings-tab" data-toggle="tab" href="#nav-settings" role="tab" aria-controls="nav-settings" aria-selected="false">Settings</a>
+    <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Настройки</a>
   </div>
 </nav>
 <div class="tab-content" id="nav-tabContent">
-  <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">...</div>
-  <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">...</div>
-  <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>
-  <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab">.d..</div>  
+  <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+    <br>
+    <div class="list-group">
+        {% for g in groups %}
+          <a href="{% url 'group' g.pk %}" class="list-group-item list-group-item-action" style="font-size: 1.5em; margin-bottom: 5px;">{{ g.name }}</a>
+        {% endfor %}
+    </div>
+  </div>
+  <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">..z.</div>
+  <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+    <br>
+    <label for="clientname">Имя</label>
+    <input name="clientname" type="text" class="form-control form-control-lg" id="clientname" value="{{ user.first_name }}">
+    <br>
+    <label for="clientsurname">Фамилия</label>
+    <input name="clientsurname" type="text" class="form-control form-control-lg" id="clientsurname" value="{{ user.last_name }}">
+    <br>
+    <label for="clientemail">E-mail</label>
+    <input name="clientemail" type="text" class="form-control form-control-lg" id="clientemail" value="{{ user.email }}">
+    <br>
+  </div>
 </div>
 </form>
 

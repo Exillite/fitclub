@@ -92,16 +92,21 @@ def user_info(request, id):
         user.groups.clear()
         user.groups.add(group)
 
+        user.first_name = data['clientname']
+        user.last_name = data['clientsurname']
+        user.email = data['clientemail']
+
         user.save()
+
+
     if len(user.groups.all()) > 0:
         rl = user.groups.all()[0].name
     else:
-        rl = "none"
-    
+        rl = "none"    
 
-    
+    groups = SportGroup.objects.filter(trener=user)
 
-    return render(request=request, template_name="fitclub/user.html", context={'user': user, 'rl': rl})
+    return render(request=request, template_name="fitclub/user.html", context={'user': user, 'rl': rl, 'groups': groups})
 
 
 def admin_groups(request):
@@ -189,6 +194,13 @@ def client_info(request, id):
         for g in groups:
             if f'clientgroup{g.pk}' in data:
                 client.groups.add(g)
+            
+        client.name = data['clientname']
+        client.surname = data['clientsurname']
+        client.phone = data['clientphone']
+        client.email = data['clientemail']
+
+        client.save()
 
     return render(request=request, template_name="fitclub/client.html", context={'user': client, 'gruops': groups})
 
