@@ -264,3 +264,23 @@ def edit_time(request, time_id):
     d = DAYS[time.day]
 
     return render(request=request, template_name="fitclub/edit_time.html", context={'group': group, 'start': ts, 'end': te, 'day': d})
+
+
+@csrf_exempt
+def new_trening(request, group_id):
+    User = get_user_model()
+    group = SportGroup.objects.get(pk=group_id)
+    if request.method == "POST":
+        pass
+    
+    treniers = User.objects.filter(groups__name='trener')
+
+    rl = ""
+    if len(request.user.groups.all()) > 0:
+        rl = request.user.groups.all()[0].name
+    else:
+        rl = "none"
+
+    clients = Client.objects.filter(groups=group.pk)
+
+    return render(request=request, template_name="fitclub/new_trening.html", context={'group': group, 'user': request.user, 'treniers': treniers, 'rl': rl, 'clients': clients})
