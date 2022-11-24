@@ -75,15 +75,33 @@ def admin_users(request):
         return redirect('login')
     
     User = get_user_model()
-    users = User.objects.all()
-
+    users = User.objects.filter(
+    groups__name__in=['trener', 'admin'])
     return render(request=request, template_name="fitclub/users.html", context={'users': users})
 
-
+@csrf_exempt
 def user_info(request, id):
     User = get_user_model()
     user = User.objects.get(pk=id)
-    return render(request=request, template_name="fitclub/user.html", context={'user': user})
+
+    if request.method == "POST":
+        data = request.POST
+        
+        role = data['role']
+        group = Group.objects.get(name=role)
+        user.groups.clear()
+        user.groups.add(group)
+
+        user.save()
+    if len(user.groups.all()) > 0:
+        rl = user.groups.all()[0].name
+    else:
+        rl = "none"
+    
+
+    
+
+    return render(request=request, template_name="fitclub/user.html", context={'user': user, 'rl': rl})
 
 
 def admin_groups(request):
