@@ -3,7 +3,16 @@
 
 {% block content %}
 
-<button type="button" class=" float-right btn btn-lg btn-primary">Сохранить</button>
+<style>
+  input[type='checkbox'] { 
+      transform: scale(1.3); 
+      margin-top: 15px;
+  }
+</style>
+
+
+<form method="post">
+<button type="sybmit" class=" float-right btn btn-lg btn-primary">Сохранить</button>
 <br>
 <br>
 <br>
@@ -39,7 +48,7 @@
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
     <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Группы</a>
     <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Занятия</a>
-    <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Contact</a>
+    <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Настройки</a>
   </div>
 </nav>
 <div class="tab-content" id="nav-tabContent">
@@ -48,15 +57,29 @@
     
     {% for group in gruops %}
     <div class="form-check">
-      <input class="form-check-input" type="checkbox" name="exampleRadios" id="rtrener" value="{{ trener.pk }}" {% if user.group.pk == group.pk %}checked{% endif %}>
-      <label class="form-check-label" style="font-size: 24px;" for="rtrener">
+      <input class="form-check-input" type="checkbox" name="clientgroup{{ group.pk }}" value="on" id="cgroup" {% if group in user.groups.all %}checked{% endif %}>
+      <label class="form-check-label" style="font-size: 28px;" for="cgroup">
       {{ group.name }}
       </label>
     </div>
     {% endfor %}
   </div>
   <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">...</div>
-  <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>
+  <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+    <br>
+    <label for="clientname">Имя</label>
+    <input name="clientname" type="text" class="form-control form-control-lg" id="clientname" value="{{ user.name }}">
+    <br>
+    <label for="clientsurname">Фамилия</label>
+    <input name="clientsurname" type="text" class="form-control form-control-lg" id="clientsurname" value="{{ user.surname }}">
+    <br>
+    <label for="clientphone">Телефон</label>
+    <input name="clientphone" type="text" class="form-control form-control-lg" id="clientphone" value="{{ user.phone }}">
+    <br>
+    <label for="clientemail">E-mail</label>
+    <input name="clientemail" type="text" class="form-control form-control-lg" id="clientemail" value="{{ user.email }}">
+    <br>
+  </div>
 </div>  
-
+</form>
 {% endblock %}

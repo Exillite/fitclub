@@ -160,10 +160,18 @@ def admin_clients(request):
 
     return render(request=request, template_name="fitclub/clients.html", context={'clients': clients})
 
-
+@csrf_exempt
 def client_info(request, id):
     client = Client.objects.get(pk=id)
     groups = SportGroup.objects.all()
+    if request.method == "POST":
+        data = request.POST
+        
+        client.groups.clear()
+        for g in groups:
+            if f'clientgroup{g.pk}' in data:
+                client.groups.add(g)
+
     return render(request=request, template_name="fitclub/client.html", context={'user': client, 'gruops': groups})
 
 @csrf_exempt
