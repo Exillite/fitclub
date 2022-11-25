@@ -47,7 +47,14 @@
         {% endfor %}
     </div>
   </div>
-  <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">..z.</div>
+  <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+    <div class="list-group">
+      <br>
+      {% for tr in trenings %}
+        <a href="{% url 'trening' tr.pk %}" class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ tr.day|date:"D d M" }}: {{ tr.start|time:"H:i" }} - {{ tr.col }} чел.</a>
+      {% endfor %}
+  </div>
+  </div>
   <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
     <br>
     <label for="clientname">Имя</label>
