@@ -31,6 +31,7 @@
         <div class="nav nav-tabs" id="nav-tab" role="tablist">
             <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Тренер</a>
             <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Участники</a>
+            <a class="nav-item nav-link" id="nav-tren-tab" data-toggle="tab" href="#nav-tren" role="tab" aria-controls="nav-tren" aria-selected="false">Участники</a>
             <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Настройки</a>
         </div>
     </nav>
@@ -67,6 +68,14 @@
                 <a href="{% url 'client' cl.pk %}" class="list-group-item list-group-item-action" style="font-size: 1.5em; margin-bottom: 5px;">{{ cl.name }} {{ cl.surname }}</a> {% endfor %}
             </div>
 
+        </div>
+        <div class="tab-pane fade" id="nav-tren" role="tabpanel" aria-labelledby="nav-tren-tab">
+            <div class="list-group">
+              <br>
+              {% for tr in trenings %}
+                <a href="{% url 'trening' tr.pk %}" class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ tr.day|date:"D d M" }}: {{ tr.start|time:"H:i" }} - {{ tr.col }} чел.</a>
+              {% endfor %}
+            </div>
         </div>
         <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
             <br>

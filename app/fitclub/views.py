@@ -106,7 +106,9 @@ def user_info(request, id):
 
     groups = SportGroup.objects.filter(trener=user)
 
-    return render(request=request, template_name="fitclub/user.html", context={'user': user, 'rl': rl, 'groups': groups})
+    trenings = Trening.objects.filter(trener=user).order_by('-day', '-start')
+
+    return render(request=request, template_name="fitclub/user.html", context={'user': user, 'rl': rl, 'groups': groups, 'trenings': trenings})
 
 
 def admin_groups(request):
@@ -172,7 +174,9 @@ def group_info(request, id):
     for time in times:
         days.append((DAYS[time.day], time))
 
-    return render(request=request, template_name="fitclub/group.html", context={'group': group, 'treners': tereners, 'clients': clients, 'days': days})
+    trenings = Trening.objects.filter(group=group).order_by('-day', '-start')
+
+    return render(request=request, template_name="fitclub/group.html", context={'group': group, 'treners': tereners, 'clients': clients, 'days': days, 'trenings':trenings})
 
 
 def admin_clients(request):
@@ -202,7 +206,9 @@ def client_info(request, id):
 
         client.save()
 
-    return render(request=request, template_name="fitclub/client.html", context={'user': client, 'gruops': groups})
+    trenings = Trening.objects.filter(clients__id=client.pk).order_by('-day', '-start')
+
+    return render(request=request, template_name="fitclub/client.html", context={'user': client, 'gruops': groups, 'trenings': trenings})
 
 @csrf_exempt
 def add_new_time(request, group_id):
@@ -313,7 +319,7 @@ def new_trening(request, group_id):
 
 
 def admin_trenings(request):
-    treinings = Trening.objects.all()
+    treinings = Trening.objects.all().order_by('-day', '-start')
 
     return render(request=request, template_name='fitclub/trenings.html', context={'trenings': treinings})
 
