@@ -310,3 +310,63 @@ def new_trening(request, group_id):
         rl = "none"
 
     return render(request=request, template_name="fitclub/new_trening.html", context={'group': group, 'user': request.user, 'treniers': treniers, 'rl': rl, 'clients': clients})
+
+
+def admin_trenings(request):
+    treinings = Trening.objects.all()
+
+    return render(request=request, template_name='fitclub/trenings.html', context={'trenings': treinings})
+
+@csrf_exempt
+def info_trenings(request, id):
+    trening = Trening.objects.get(pk=id)
+    clients = Client.objects.filter(groups=trening.group.pk)
+
+    if request.method == "POST":
+        data = request.POST
+
+        ts = datetime.time(*(map(int, data['starttime'].split(':'))))
+        te = datetime.time(*(map(int, data['endtime'].split(':'))))
+
+        dt = datetime.date(*(map(int, data['date'].split('-'))))
+
+        trener = User.objects.get(pk=int(data['trener']))
+        if 'helper' in data:
+            if data['helper'] != "none":
+                helper = User.objects.get(pk=int(data['helper']))
+            else:
+                helper = None
+        else:
+            helper = None
+        
+        col = 0
+        parcts = []
+
+        for cl in clients:
+            if f'clientgroup{cl.pk}' in data:
+                col += 1
+                parcts.append(cl)
+        
+        progul = True if col == 0 else False
+        
+        trening.start = ts
+        trening.end = te
+        trening.day = dt
+        trening.trening_type = "group"
+        trening.col = col
+        trening.is_was = True
+        trening.progul = progul
+        trening.trener = trener
+        trening.helper = helper
+        trening.clients.clear()
+        if col > 0:
+            trening.clients.add(*parcts)
+        trening.save()
+    
+
+    treniers = User.objects.filter(groups__name='trener')
+    pr = []
+    for cl in trening.clients.all():
+        pr.append(cl.pk)
+
+    return render(request=request, template_name="fitclub/edit_trening.html", context={'trening': trening, 'treniers': treniers, 'clients': clients, 'pr': pr})

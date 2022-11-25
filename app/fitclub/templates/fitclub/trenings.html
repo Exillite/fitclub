@@ -1,28 +1,28 @@
 {% extends 'fitclub/base.html' %}
 {% block content %}
-    <div class="row">
-        <div class="col-9"></div>
-        <div class="col-3"><button type="button" class="btn btn-primary btn-lg btn-block" onclick="window.location = {% url 'addgroup' %};">Добавит группу</button></div>
-    </div>
-    <br>
+
     <form action="get">
         <table class="table">
             <thead>
             <tr>
-                <th scope="col">Название группы</th>
-                <th scope="col">Кол. занимающихся</th>
+                <th scope="col">Группа</th>
+                <th scope="col">Дата</th>
+                <th scope="col">Время</th>
+                <th scope="col">Кол. человек</th>
                 <th scope="col">Тренер</th>
                 <th scope="col">Редактировать</th>
             </tr>
             </thead>
             <tbody>
 
-            {% for group in groups %}
+            {% for tr in trenings %}
             <tr>
-                <td>{{ group.name }}</td>
-                <td>{{ group.count_clients }}</td>
-                <td>{{ group.trener.last_name }} {{ group.trener.first_name|make_list|first }}.</td>
-                <td><a href="{% url 'group' group.pk %}" class="btn-sm btn-primary" role="button">Редактировать</a></td>
+                <td>{{ tr.group.name }}</td>
+                <td>{{ tr.day|date:"D d M" }}</td>
+                <td>{{ tr.start|time:"H:i" }} - {{ tr.end|time:"H:i" }}</td>
+                <td>{{ tr.col }}</td>
+                <td>{{ tr.trener.last_name }} {{ tr.trener.first_name|make_list|first }}.</td>
+                <td><a href="{% url 'trening' tr.pk %}" class="btn-sm btn-primary" role="button">Редактировать</a></td>
             </tr>
             {% endfor %}
 

@@ -16,5 +16,7 @@ urlpatterns = [
     path('client/<int:id>', client_info, name='client'),
     path('newtime/<int:group_id>', add_new_time, name='newtime'),
     path('edittime/<int:time_id>', edit_time, name='edittime'),
-    path('newtrening/<int:group_id>', new_trening, name='newtrining')
+    path('newtrening/<int:group_id>', new_trening, name='newtrining'),
+    path('trenings/', admin_trenings, name='trenings'),
+    path('trening/<int:id>', info_trenings, name='trening')
 ]
