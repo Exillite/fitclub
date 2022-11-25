@@ -270,9 +270,37 @@ def edit_time(request, time_id):
 def new_trening(request, group_id):
     User = get_user_model()
     group = SportGroup.objects.get(pk=group_id)
+    clients = Client.objects.filter(groups=group.pk)
     if request.method == "POST":
-        pass
-    
+        data = request.POST
+
+        ts = datetime.time(*(map(int, data['starttime'].split(':'))))
+        te = datetime.time(*(map(int, data['endtime'].split(':'))))
+
+        dt = datetime.date(*(map(int, data['date'].split('-'))))
+
+        trener = User.objects.get(pk=int(data['trener']))
+        if 'helper' in data:
+            helper = User.objects.get(pk=int(data['helper']))
+        else:
+            helper = None
+        
+        col = 0
+        parcts = []
+        for cl in clients:
+            if f'clientgroup{cl.pk}' in data:
+                col += 1
+                parcts.append(cl)
+        
+        progul = True if col == 0 else False
+        
+        trening = Trening(start=ts, end=te, day=dt, group=group, trening_type="group", col=col, is_was=True, progul=progul, trener=trener, helper=helper)
+        trening.save()
+        trening.clients.add(*parcts)
+        trening.save()
+
+        return redirect('group', id=group_id)
+
     treniers = User.objects.filter(groups__name='trener')
 
     rl = ""
@@ -280,7 +308,5 @@ def new_trening(request, group_id):
         rl = request.user.groups.all()[0].name
     else:
         rl = "none"
-
-    clients = Client.objects.filter(groups=group.pk)
 
     return render(request=request, template_name="fitclub/new_trening.html", context={'group': group, 'user': request.user, 'treniers': treniers, 'rl': rl, 'clients': clients})

@@ -44,5 +44,18 @@ class Trening(models.Model):
     col = models.IntegerField() # количество участников
     is_was = models.BooleanField() # Была ло занятие
     progul = models.BooleanField() # Был ли прогул
-    clients = models.ManyToManyField(Client, null=True, blank=True)
-
+    clients = models.ManyToManyField(Client, blank=True)
+    trener = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='royal_trainer'
+    )
+    helper = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='helper_for_training'
+    )

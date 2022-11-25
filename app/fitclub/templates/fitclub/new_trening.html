@@ -43,8 +43,8 @@
     <input required name="endtime" id="timeend" type="time" value=""  class="margin-bottom: 20px" required/>
     <br>
     <br>
-    <label for="day" style="font-size: 20px">Тренер</label>
-    <select required name="day" id="day" class="form-control" style="font-size: 20px">
+    <label for="trener" style="font-size: 20px">Тренер</label>
+    <select required name="trener" id="trener" class="form-control" style="font-size: 20px">
 
         {% if rl == "trener" %}
         
@@ -66,8 +66,8 @@
     
     <br>
     <br>
-    <label for="day" style="font-size: 20px">Помощник тренера <div style="font-size: 12px">(не обязательно)</div></label>
-    <select name="day" id="day" class="form-control" style="font-size: 20px">
+    <label for="helper" style="font-size: 20px">Помощник тренера <div style="font-size: 12px">(не обязательно)</div></label>
+    <select name="helper" id="helper" class="form-control" style="font-size: 20px">
 
         <option disabled selected value> -- Выберите помощника тренера -- </option>
         {% for t in treniers %}
