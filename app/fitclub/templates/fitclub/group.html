@@ -82,6 +82,9 @@
             <label for="groupname">Название группы</label>
             <input name="groupname" type="text" class="form-control form-control-lg" id="groupname" value="{{ group.name }}">
             <br>
+            <a href="{% url 'weekplan' %}" class="btn btn-sm btn-info">Открыть расписание</a>
+            <br>
+            <br>
             {% for day in days %}
                 <p style="font-size: 18px">{{ day.0 }}: {{day.1.start}} - {{ day.1.end }}
                     <button name="edittime" value="{{ day.1.pk }}" style="margin-left: 30px" type="sybmit" class="btn btn-sm btn-primary">Редактировать</button>

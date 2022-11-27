@@ -1,0 +1,110 @@
+{% extends 'fitclub/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://uicdn.toast.com/calendar/v2.1.3/toastui-calendar.min.css" />
+<script src="https://uicdn.toast.com/calendar/v2.1.3/toastui-calendar.min.js"></script>
+<link rel="stylesheet" href="https://uicdn.toast.com/calendar/v2.1.3/toastui-calendar.min.css" />
+
+
+<div id="calendar" style="height: 95vh;"></div>
+
+
+<script>
+
+  const Calendar = tui.Calendar;
+
+  const container = document.getElementById('calendar');
+  const options = {
+    defaultView: 'week',
+    usageStatistics: false,
+    timezone: {
+      zones: [
+        {
+          timezoneName: 'Europe/Moscow',
+          displayLabel: 'Время',
+        },
+      ],
+    },
+    isReadOnly: true,
+    calendars: [
+      {
+        id: 'cal1',
+      },
+    ],
+  };
+
+  
+  const calendar = new Calendar(container, options);
+
+
+  calendar.createEvents([
+  
+  {% for t in times %}
+    {
+      id: 'event{{ t.pk }}',
+      calendarId: 'cal1',
+      title: '{{ t.group.name }}',
+      start: '2022-11-{{ t.day|add:20 }}T{{ t.start|time:"H:i" }}:00',
+      end: '2022-11-{{ t.day|add:20 }}T{{ t.end|time:"H:i" }}:00',
+      state: null,
+      location: '<a href="{% url 'group' t.group.pk %}"> Группа</a>',
+      attendees: ['<a href="{% url 'user' t.group.trener.pk %}">{{ t.group.trener.last_name }} {{ t.group.trener.first_name|make_list|first }}.</a>']
+    },
+  {% endfor %}
+
+  ]);
+
+  calendar.setOptions({
+    useDetailPopup: true,
+    week: {
+      taskView: false,
+      eventView: ['time'],
+      showNowIndicator: false,
+      hourStart: 6,
+      hourEnd: 22,
+      startDayOfWeek: 1,
+      dayNames: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Суб'],
+    },
+    month: {
+      dayNames: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Суб'],
+      startDayOfWeek: 1,
+    },
+    template: {
+      popupEdit() {
+        return '<a href="{% url 'groups' %}">Редактировать</a>';
+      },
+      popupDelete() {
+        return '';
+      },
+      popupDetailBody({ body }) {
+        console.log(body)
+        return body;
+      },
+      weekDayName(model) {
+        return `<p style="font-size: 21px">${model.dayName}</p>`;
+      },
+      timegridDisplayPrimaryTime({ time }) {
+        tt = time.toLocaleString('en-US').split(' ')[4].split(':')
+        return `${tt[0]}:${tt[1]}`;
+      },
+      timegridDisplayTime({ time }) {
+        tt = time.toLocaleString('en-US').split(' ')[4].split(':')
+        return `${tt[0]}:${tt[1]}`;
+      },
+      timegridNowIndicatorLabel({ time }) {
+        tt = time.toLocaleString('en-US').split(' ')[4].split(':')
+        return `${tt[0]}:${tt[1]}`;
+      },
+      
+    },
+  });
+
+
+  calendar.changeView('week');
+  calendar.setDate(new Date(2022, 10, 21));
+  console.log(calendar.getDate());
+</script>
+  
+
+{% endblock %}

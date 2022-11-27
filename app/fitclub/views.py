@@ -376,3 +376,10 @@ def info_trenings(request, id):
         pr.append(cl.pk)
 
     return render(request=request, template_name="fitclub/edit_trening.html", context={'trening': trening, 'treniers': treniers, 'clients': clients, 'pr': pr})
+
+
+def week_plan(request):
+    
+    times = GroupTime.objects.all()
+
+    return render(request=request, template_name="fitclub/calendar.html", context={'times': times})

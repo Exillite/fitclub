@@ -18,5 +18,6 @@ urlpatterns = [
     path('edittime/<int:time_id>', edit_time, name='edittime'),
     path('newtrening/<int:group_id>', new_trening, name='newtrining'),
     path('trenings/', admin_trenings, name='trenings'),
-    path('trening/<int:id>', info_trenings, name='trening')
+    path('trening/<int:id>', info_trenings, name='trening'),
+    path('weekplan/', week_plan, name='weekplan'),
 ]
