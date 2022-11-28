@@ -39,7 +39,7 @@ class Trening(models.Model):
     start = models.TimeField()
     end = models.TimeField()
     day = models.DateField()
-    group = models.ForeignKey('SportGroup', on_delete=models.PROTECT, null=True)
+    group = models.ForeignKey('SportGroup', on_delete=models.PROTECT, null=True, blank=True)
     trening_type = models.CharField(max_length=50) # "personal" / "group"
     col = models.IntegerField() # количество участников
     is_was = models.BooleanField() # Была ло занятие

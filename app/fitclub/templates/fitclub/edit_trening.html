@@ -19,7 +19,11 @@
 <div class="card">
   <div class="card-body">
     <div class="row align-items-center h-100">
-        <h1>Занитие группы {{ trening.group.name }}</h1>
+        {% if trening.trening_type == "group" %}
+          <h1>Занитие группы {{ trening.group.name }}</h1>
+        {% else %}
+          <h1>Индивидуальное занятие {{ client.name }} {{ client.surname }}</h1>
+        {% endif %}
     </div>
   </div>
 </div>
@@ -28,7 +32,9 @@
 <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
     <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Информация</a>
-    <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Участники</a>
+    {% if trening.trening_type == "group" %}
+      <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Участники</a>
+    {% endif %}
   </div>
 </nav>
 <div class="tab-content" id="nav-tabContent">
@@ -41,6 +47,16 @@
     <input required name="starttime" id="timestart" type="time" value="{{ trening.start|time:"H:i" }}" required style="margin-right: 100px; margin-bottom: 20px;"/>
     <label for="timeend" style="font-size: 20px; margin-right: 8px;">Врмея окончания</label>
     <input required name="endtime" id="timeend" type="time" value="{{ trening.end|time:"H:i" }}" class="margin-bottom: 20px" required/>
+    
+    {% if trening.trening_type == "personal" %}
+      <br>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="progul" value="on" id="cgroup"  {% if trening.progul %} checked {% endif %}>
+        <label class="form-check-label" style="font-size: 28px;" for="cgroup">
+            Прогул
+        </label>
+      </div>
+    {% endif %}
     <br>
     <br>
     <label for="trener" style="font-size: 20px">Тренер</label>
@@ -68,6 +84,7 @@
     
 
   </div>
+  {% if trening.trening_type == "group" %}
   <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
     <br>
     {% for cl in clients %}
@@ -79,6 +96,7 @@
         </div>
     {% endfor %}
   </div>
+  {% endif %}
 </div>
 </form>
 
