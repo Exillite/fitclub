@@ -20,4 +20,5 @@ urlpatterns = [
     path('trenings/', admin_trenings, name='trenings'),
     path('trening/<int:id>', info_trenings, name='trening'),
     path('weekplan/', week_plan, name='weekplan'),
+    path('calendar/<str:date>/<str:view>', calendar, name='calendar'),
 ]

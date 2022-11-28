@@ -383,3 +383,15 @@ def week_plan(request):
     times = GroupTime.objects.all()
 
     return render(request=request, template_name="fitclub/calendar.html", context={'times': times})
+
+
+def calendar(request, date='today', view='month'):
+    trenings = Trening.objects.all()
+    if date == 'today':
+        date = datetime.date.today().strftime("%Y-%m-%d")
+
+    dt = date.split('-')
+    dt[1] = str(int(dt[1]) - 1)
+
+    return render(request=request, template_name="fitclub/cal.html", context={'trenings': trenings, 'view': view, 'date': dt})
+
