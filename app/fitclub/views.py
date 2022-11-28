@@ -395,3 +395,44 @@ def calendar(request, date='today', view='month'):
 
     return render(request=request, template_name="fitclub/cal.html", context={'trenings': trenings, 'view': view, 'date': dt})
 
+
+@csrf_exempt
+def new_per(request, id):
+    User = get_user_model()
+    client = Client.objects.get(pk=id)
+    if request.method == "POST":
+        data = request.POST
+
+        ts = datetime.time(*(map(int, data['starttime'].split(':'))))
+        te = datetime.time(*(map(int, data['endtime'].split(':'))))
+
+        dt = datetime.date(*(map(int, data['date'].split('-'))))
+
+        trener = User.objects.get(pk=int(data['trener']))
+        if 'helper' in data:
+            helper = User.objects.get(pk=int(data['helper']))
+        else:
+            helper = None
+        
+        progul = False
+        if "progul" in data:
+            progul =  True
+
+        col = 0 if progul else 1
+        
+        trening = Trening(start=ts, end=te, day=dt, group=None, trening_type="personal", col=col, is_was=True, progul=progul, trener=trener, helper=helper)
+        trening.save()
+        trening.clients.add(client)
+        trening.save()
+
+        return redirect('client', id=id)
+
+    treniers = User.objects.filter(groups__name='trener')
+
+    rl = ""
+    if len(request.user.groups.all()) > 0:
+        rl = request.user.groups.all()[0].name
+    else:
+        rl = "none"
+
+    return render(request=request, template_name="fitclub/new_per.html", context={'client': client, 'user': request.user, 'treniers': treniers, 'rl': rl})

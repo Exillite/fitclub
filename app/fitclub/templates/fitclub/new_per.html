@@ -1,0 +1,90 @@
+{% extends 'fitclub/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    input[type='checkbox'] { 
+        transform: scale(1.3); 
+        margin-top: 15px;
+    }
+</style>
+
+<form method="post">
+<button type="sybmit" class=" float-right btn btn-lg btn-primary">Сохранить</button>
+<br>
+<br>
+<br>
+
+<div class="card">
+  <div class="card-body">
+    <div class="row align-items-center h-100">
+        <h1>Индивидуальное занятие {{ client.name }} {{ client.surname }}</h1>
+    </div>
+  </div>
+</div>
+<br>
+
+<nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Информация</a>
+  </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+  <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+    <br>
+    <label for="clientname" style="font-size: 20px">Дата</label>
+    <input required name="date" class="form-control form-control-lg" type="date" id="date">
+    <br>
+    <label for="timestart" style="font-size: 20px; margin-right: 8px;">Врмея начала</label>
+    <input required name="starttime" id="timestart" type="time" required style="margin-right: 100px; margin-bottom: 20px;"/>
+    <label for="timeend" style="font-size: 20px; margin-right: 8px;">Врмея окончания</label>
+    <input required name="endtime" id="timeend" type="time" value=""  class="margin-bottom: 20px" required/>
+    <br>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="progul" value="on" id="cgroup">
+        <label class="form-check-label" style="font-size: 28px;" for="cgroup">
+            Прогул
+        </label>
+      </div>
+    <br>
+    <br>
+    <label for="trener" style="font-size: 20px">Тренер</label>
+    <select required name="trener" id="trener" class="form-control" style="font-size: 20px">
+
+        {% if rl == "trener" %}
+        
+            <option disabled value> -- Выберите тренера -- </option>
+            {% for t in treniers %}
+                <option {% if t.pk == user.pk %} selected {% endif %} value="{{ t.pk }}">{{ t.first_name }} {{ t.last_name }}</option>
+            {% endfor %}
+
+        {% else %}
+        
+            <option disabled selected value> -- Выберите тренера -- </option>
+            {% for t in treniers %}
+                <option value="{{ t.pk }}">{{ t.first_name }} {{ t.last_name }}</option>
+            {% endfor %}
+
+        {% endif %}
+
+    </select>
+    
+    <br>
+    <br>
+    <label for="helper" style="font-size: 20px">Помощник тренера <div style="font-size: 12px">(не обязательно)</div></label>
+    <select name="helper" id="helper" class="form-control" style="font-size: 20px">
+
+        <option disabled selected value> -- Выберите помощника тренера -- </option>
+        {% for t in treniers %}
+            <option value="{{ t.pk }}">{{ t.first_name }} {{ t.last_name }}</option>
+        {% endfor %}
+
+    </select>
+    
+
+  </div>
+</div>
+</form>
+
+{% endblock %}

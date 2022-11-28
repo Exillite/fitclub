@@ -21,4 +21,5 @@ urlpatterns = [
     path('trening/<int:id>', info_trenings, name='trening'),
     path('weekplan/', week_plan, name='weekplan'),
     path('calendar/<str:date>/<str:view>', calendar, name='calendar'),
+    path('newper/<int:id>', new_per, name='newper'),
 ]
