@@ -60,11 +60,20 @@
         end: '{{ t.day|date:"Y-m-d" }}T{{ t.end|time:"H:i" }}:00',
         state: null,
         location: '<a href="{% url 'group' t.group.pk %}"> Группа</a>',
-        attendees: ['<a href="{% url 'user' t.group.trener.pk %}">{{ t.group.trener.last_name }} {{ t.group.trener.first_name|make_list|first }}.</a>'],
+        attendees: ['<a href="{% url 'user' t.trener.pk %}">{{ t.trener.last_name }} {{ t.trener.first_name|make_list|first }}.</a>'],
         body: `<a href="{% url 'trening' t.pk %}">Занятие</a>`
       
       {% else %}
       
+        id: 'event{{ t.pk }}',
+        calendarId: 'cal1',
+        title: '{{ t.clients.all.0.surname }} {{ t.clients.all.0.name|make_list|first }}.',
+        start: '{{ t.day|date:"Y-m-d" }}T{{ t.start|time:"H:i" }}:00',
+        end: '{{ t.day|date:"Y-m-d" }}T{{ t.end|time:"H:i" }}:00',
+        state: null,
+        location: '<a href="{% url 'client' t.clients.all.0.pk %}"> Клиент</a>',
+        attendees: ['<a href="{% url 'user' t.trener.pk %}">{{ t.trener.last_name }} {{ t.trener.first_name|make_list|first }}.</a>'],
+        body: `<a href="{% url 'trening' t.pk %}">Занятие</a>`
       
       
       {% endif %}
