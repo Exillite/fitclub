@@ -96,7 +96,11 @@
         tt = time.toLocaleString('en-US').split(' ')[4].split(':')
         return `${tt[0]}:${tt[1]}`;
       },
-      
+      popupDetailDate({ start, end }) {
+        t1 = start.toLocaleString('en-US').split(' ')[4].split(':')
+        t2 = end.toLocaleString('en-US').split(' ')[4].split(':')
+        return `${t1[0]}:${t1[1]} - ${t2[0]}:${t2[1]}`;
+      },
     },
   });
 
