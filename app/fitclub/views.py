@@ -22,12 +22,18 @@ DAYS = [
 ]
 
 def ini(request):
-    group1 = Group(name = "admin")
-    group1.save()
-    group2 = Group(name = "trener")
-    group2.save()
+    ret = "OK\n"
+    g1 = Group.objects.get(name="admin")
+    if not g1:
+        group1 = Group(name = "admin")
+        group1.save()
+        group2 = Group(name = "trener")
+        group2.save()
+        ret += "User groups\n"
     
-    return HttpResponse("OK")
+    
+    
+    return HttpResponse(ret)
 
 
 def index(request):
