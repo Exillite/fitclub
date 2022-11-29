@@ -59,3 +59,33 @@ class Trening(models.Model):
         blank=True,
         related_name='helper_for_training'
     )
+
+
+class Param(models.Model):
+    key = models.CharField(max_length=150)
+    value = models.IntegerField(null=True, blank=True)
+
+class Peyment(models.Model):
+    client = models.ForeignKey('Client', on_delete=models.PROTECT)
+    pay_type = models.CharField(max_length=150)
+    date = models.DateField() 
+    value = models.IntegerField()
+
+
+class Spending(models.Model):
+    key = models.CharField(max_length=255)
+    value = models.IntegerField()
+    spend_type = models.CharField(max_length=150)
+    date = models.DateField(null=True, blank=True)
+
+class Salary(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='who_trainer'
+    )
+    date = models.DateField() 
+    accure = models.IntegerField()
+    give = models.IntegerField()

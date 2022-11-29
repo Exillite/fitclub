@@ -37,8 +37,8 @@
           {{user.email}}
         {% endif %}
       </h5>
-      <a href="{% url 'newper' user.pk %}" class="btn btn-info"  style="margin-left: auto; margin-right:30px;" role="button">Новое занятие</a>
-
+      <a href="{% url 'newper' user.pk %}" class="btn btn-info"  style="margin-left: auto; margin-right:5px; margin-bottom: 5px;" role="button">Новое занятие</a>
+      <a href="{% url 'newpay' user.pk %}" class="btn btn-info"  style="margin-left: auto; margin-right:30px; margin-bottom: 5px;" role="button">Оплата</a>
     </div>
 
   </div>

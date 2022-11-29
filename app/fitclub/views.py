@@ -23,14 +23,12 @@ DAYS = [
 
 def ini(request):
     ret = "OK\n"
-    g1 = Group.objects.get(name="admin")
-    if not g1:
-        group1 = Group(name = "admin")
-        group1.save()
-        group2 = Group(name = "trener")
-        group2.save()
-        ret += "User groups\n"
-    
+
+    group1 = Group(name = "admin")
+    group1.save()
+    group2 = Group(name = "trener")
+    group2.save()
+    ret += "User groups\n"
     
     
     return HttpResponse(ret)
@@ -484,3 +482,10 @@ def new_per(request, id):
         rl = "none"
 
     return render(request=request, template_name="fitclub/new_per.html", context={'client': client, 'user': request.user, 'treniers': treniers, 'rl': rl})
+
+
+@csrf_exempt
+def new_pay(request, client_id):
+    client = Client.objects.get(pk=client_id)
+    
+    return render(request=request, template_name="fitclub/new_pay.html", context={'client': client})

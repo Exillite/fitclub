@@ -1,0 +1,22 @@
+{% extends 'fitclub/base.html' %}
+{% block content %}
+    <br>
+    <br>
+
+    <form method="post">
+    <div class="form-group">
+        <label for="groupname"><h3>Оплата {{ client.name }} {{ client.surname }}</h3></label>
+        <br>
+        <select name="role" class="custom-select custom-select-lg" required>
+            <option selected selected disabled value>-- выберите тип оплаты --</option>
+            <option value="money">Наличные</option>
+            <option value="card">Карта</option>
+        </select>
+        <br><br>
+        <input name="groupname" required type="number" class="form-control form-control-lg" id="groupname" placeholder="Введите сумму">
+    </div>
+
+        <button type="submit" class="btn-block btn-lg btn-primary">Внести платёж</button>
+    </form>
+
+{% endblock %}
