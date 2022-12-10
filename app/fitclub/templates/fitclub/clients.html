@@ -6,7 +6,6 @@
             <tr>
                 <th scope="col">Имя</th>
                 <th scope="col">Фамилия</th>
-                <th scope="col">Фамилия</th>
                 <th scope="col">Редактировать</th>
             </tr>
             </thead>
@@ -16,7 +15,6 @@
             <tr>
                 <td>{{ user.name }}</td>
                 <td>{{ user.surname }}</td>
-                <td>{{ user.group.name }}</td>
                 <td><a href="{% url 'client' user.pk %}" class="btn-sm btn-primary" role="button">Редактировать</a></td>
             </tr>
             {% endfor %}
