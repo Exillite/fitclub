@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import Group, User
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
@@ -112,7 +113,103 @@ def user_info(request, id):
 
     trenings = Trening.objects.filter(trener=user).order_by('-day', '-start')
 
-    return render(request=request, template_name="fitclub/user.html", context={'user': user, 'rl': rl, 'groups': groups, 'trenings': trenings})
+    year = datetime.date.today().year
+    month = datetime.date.today().month
+
+    sums = []
+    mnthtren = Trening.objects.filter(Q(trener=user) | Q(helper=user), day__year=str(year), day__month=str(month)).order_by('-day', '-start')
+
+    sp = Param.objects.get(key="sum_from_late").value
+    sa = Param.objects.get(key="sum_from_asist").value
+    ss = Param.objects.get(key="sum_from_single").value
+    sg = Param.objects.get(key="sum_from_group").value
+    so = Param.objects.get(key="sum_from_one").value
+    
+    sm = 0
+    
+    for t in mnthtren:
+        if t.progul == True:
+            sums.append([sp, "Пропущенное занятие"])
+            sm += sp
+        elif t.helper == user:
+            sums.append([sa, "Помощь в качестве второго тренера"])
+            sm += sa
+        else:
+            if t.trening_type == "group":
+                if t.col == 1:
+                    sums.append([ss, "Групповое занятие"])
+                    sm += ss
+                else:
+                    sums.append([sg, "Групповое занятие"])
+                    sm += sg
+            else:
+                sums.append([so, "Персональная тренировка"])
+                sm += so
+
+    return render(request=request, template_name="fitclub/user.html", context={'user': user, 'rl': rl, 'groups': groups, 'trenings': trenings, 'sums': sums, 'ym': f"{year}-{month}", 'sm': sm})
+
+
+@csrf_exempt
+def user_info_zp(request, id, month, year):
+    User = get_user_model()
+    user = User.objects.get(pk=id)
+
+    if request.method == "POST":
+        data = request.POST
+        
+        role = data['role']
+        group = Group.objects.get(name=role)
+        user.groups.clear()
+        user.groups.add(group)
+
+        user.first_name = data['clientname']
+        user.last_name = data['clientsurname']
+        user.email = data['clientemail']
+
+        user.save()
+
+
+    if len(user.groups.all()) > 0:
+        rl = user.groups.all()[0].name
+    else:
+        rl = "none"    
+
+    groups = SportGroup.objects.filter(trener=user)
+
+    trenings = Trening.objects.filter(trener=user).order_by('-day', '-start')
+    
+    
+    sums = []
+    mnthtren = Trening.objects.filter(Q(trener=user) | Q(helper=user), day__year=str(year), day__month=str(month)).order_by('-day', '-start')
+
+    sp = Param.objects.get(key="sum_from_late").value
+    sa = Param.objects.get(key="sum_from_asist").value
+    ss = Param.objects.get(key="sum_from_single").value
+    sg = Param.objects.get(key="sum_from_group").value
+    so = Param.objects.get(key="sum_from_one").value
+    
+    sm = 0
+    
+    for t in mnthtren:
+        if t.progul == True:
+            sums.append([sp, "Пропущенное занятие"])
+            sm += sp
+        elif t.helper == user:
+            sums.append([sa, "Помощь в качестве второго тренера"])
+            sm += sa
+        else:
+            if t.trening_type == "group":
+                if t.col == 1:
+                    sums.append([ss, "Групповое занятие"])
+                    sm += ss
+                else:
+                    sums.append([sg, "Групповое занятие"])
+                    sm += (sg * t.col)
+            else:
+                sums.append([so, "Персональная тренировка"])
+                sm += so
+    
+    return render(request=request, template_name="fitclub/user.html", context={'user': user, 'rl': rl, 'groups': groups, 'trenings': trenings, 'sums': sums, 'ym': f"{year}-{month}", 'sm': sm, 'azp': True})
 
 
 def admin_groups(request):

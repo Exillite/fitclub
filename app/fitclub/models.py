@@ -73,15 +73,19 @@ class Param(models.Model):
         price_group
         price_one_month
         price_group_month
+
         sum_from_group
         sum_from_one
         sum_from_asist
         sum_from_late
+        sum_from_single   -- когда из группы пришёл один
     
     """
 
     def __str__(self):
-        return f"{self.title}"
+        if self.title != "":
+            return f"{self.title}"
+        return f"{self.key}"
 
 class Peyment(models.Model):
     client = models.ForeignKey('Client', on_delete=models.PROTECT)

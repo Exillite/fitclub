@@ -35,6 +35,7 @@
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
     <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Группы</a>
     <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Занятия</a>
+    <a class="nav-item nav-link" id="nav-zp-tab" data-toggle="tab" href="#nav-zp" role="tab" aria-controls="nav-zp" aria-selected="false">Зарплата</a>
     <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Настройки</a>
   </div>
 </nav>
@@ -48,12 +49,40 @@
     </div>
   </div>
   <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+    <br>
     <div class="list-group">
       <br>
       {% for tr in trenings %}
         <a href="{% url 'trening' tr.pk %}" class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ tr.day|date:"D d M" }}: {{ tr.start|time:"H:i" }} - {{ tr.col }} чел.</a>
       {% endfor %}
     </div>
+  </div>
+  <div class="tab-pane fade" id="nav-zp" role="tabpanel" aria-labelledby="nav-zp-tab">
+    <label for="clientname" style="font-size: 20px">Месяц</label>
+    <input required name="date" class="form-control form-control-lg" type="month" value="{{ ym }}" id="date" onchange="window.location.href = `/user/{{ user.pk }}/${this.value.split('-')[1]}/${this.value.split('-')[0]}/`">  
+
+
+    <table class="table">
+      <thead>
+      <tr>
+          <th scope="col" class="col-3">Сумма</th>
+          <th scope="col" class="col-9">Занятие</th>
+      </tr>
+      </thead>
+      <tbody>
+
+      {% for s in sums %}
+      <tr>
+          <td>{{ s.0 }}₽</td>
+          <td>{{ s.1 }}</td>
+      </tr>
+      {% endfor %}
+
+      </tbody>
+  </table>
+  <h4>Итог: {{ sm }}₽</h4>
+
+
   </div>
   <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
     <br>
