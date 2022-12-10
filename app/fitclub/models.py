@@ -64,12 +64,42 @@ class Trening(models.Model):
 class Param(models.Model):
     key = models.CharField(max_length=150)
     value = models.IntegerField(null=True, blank=True)
+    title = models.CharField(max_length=255, blank=True)
+
+
+    """
+    
+        prise_one
+        price_group
+        price_one_month
+        price_group_month
+        sum_from_group
+        sum_from_one
+        sum_from_asist
+        sum_from_late
+    
+    """
+
+    def __str__(self):
+        return f"{self.title}"
 
 class Peyment(models.Model):
     client = models.ForeignKey('Client', on_delete=models.PROTECT)
+    group = models.ForeignKey('SportGroup', on_delete=models.PROTECT, null=True, blank=True)
+    way = models.CharField(max_length=150) # "cash" / "card"
     pay_type = models.CharField(max_length=150)
-    date = models.DateField() 
+    date = models.DateField(null=True, blank=True) 
     value = models.IntegerField()
+
+
+"""
+
+    one
+    one_month
+    group
+    group_month
+
+"""
 
 
 class Spending(models.Model):

@@ -485,7 +485,22 @@ def new_per(request, id):
 
 
 @csrf_exempt
-def new_pay(request, client_id):
+def new_pay(request, type, client_id):
     client = Client.objects.get(pk=client_id)
-    
-    return render(request=request, template_name="fitclub/new_pay.html", context={'client': client})
+    if request.method == "POST":
+        data = request.POST
+
+        if type == "one":
+            price = Param.objects.get(key="prise_one")
+            way = "card"
+            if data['role'] == "money":
+                way = "cash"
+
+            pay = Peyment(client=client, way=way, pay_type="one", date=datetime.date.today(), value=price.value)
+            pay.save()
+            return redirect('client', id=client_id)
+
+    if type == "one":
+        price = Param.objects.get(key="prise_one")
+
+        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price})

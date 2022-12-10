@@ -2,18 +2,20 @@
 {% block content %}
     <br>
     <br>
-
     <form method="post">
     <div class="form-group">
         <label for="groupname"><h3>Оплата {{ client.name }} {{ client.surname }}</h3></label>
-        <br>
-        <select name="role" class="custom-select custom-select-lg" required>
-            <option selected selected disabled value>-- выберите тип оплаты --</option>
-            <option value="money">Наличные</option>
-            <option value="card">Карта</option>
-        </select>
-        <br><br>
-        <input name="groupname" required type="number" class="form-control form-control-lg" id="groupname" placeholder="Введите сумму">
+        {% if type == "one" %}
+            <h3>Индивидуальное занятие</h3>
+            <br>
+            <select name="role" class="custom-select custom-select-lg" required>
+                <option selected selected disabled value>-- выберите тип оплаты --</option>
+                <option value="money">Наличные</option>
+                <option value="card">Карта</option>
+            </select>
+            <br><br>
+            <input name="price" required type="number" readonly class="form-control form-control-lg" id="groupname" placeholder="Введите сумму" value="{{ price.value }}">
+        {% endif %}
     </div>
 
         <button type="submit" class="btn-block btn-lg btn-primary">Внести платёж</button>

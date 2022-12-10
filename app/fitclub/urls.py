@@ -22,5 +22,5 @@ urlpatterns = [
     path('weekplan/', week_plan, name='weekplan'),
     path('calendar/<str:date>/<str:view>', calendar, name='calendar'),
     path('newper/<int:id>', new_per, name='newper'),
-    path('newpay/<int:client_id>', new_pay, name='newpay'),
+    path('newpay/<str:type>/<int:client_id>', new_pay, name='newpay'),
 ]

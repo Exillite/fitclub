@@ -38,7 +38,17 @@
         {% endif %}
       </h5>
       <a href="{% url 'newper' user.pk %}" class="btn btn-info"  style="margin-left: auto; margin-right:5px; margin-bottom: 5px;" role="button">Новое занятие</a>
-      <a href="{% url 'newpay' user.pk %}" class="btn btn-info"  style="margin-left: auto; margin-right:30px; margin-bottom: 5px;" role="button">Оплата</a>
+      <div class="dropdown">
+        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" style="margin-bottom: 5px;" aria-expanded="false">
+          Оплата
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" href="{% url 'newpay' "one" user.pk %}">Индивидуальное занятие</a>
+          <a class="dropdown-item" href="{% url 'newpay' "one_month" user.pk %}">Индивидуальное абонимент</a>
+          <a class="dropdown-item" href="{% url 'newpay' "group" user.pk %}">Групповое занятие</a>
+          <a class="dropdown-item" href="{% url 'newpay' "group_month" user.pk %}">Групповое абонимент</a>
+        </div>
+      </div>
     </div>
 
   </div>
