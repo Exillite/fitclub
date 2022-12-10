@@ -211,7 +211,7 @@ def client_info(request, id):
         client.save()
 
     trenings = Trening.objects.filter(clients__id=client.pk).order_by('-day', '-start')
-
+    payments = Peyment.objects.filter(client__pk=id)
     return render(request=request, template_name="fitclub/client.html", context={'user': client, 'gruops': groups, 'trenings': trenings})
 
 @csrf_exempt
@@ -495,12 +495,62 @@ def new_pay(request, type, client_id):
             way = "card"
             if data['role'] == "money":
                 way = "cash"
+            date = datetime.date(*(map(int, data['date'].split('-'))))
 
-            pay = Peyment(client=client, way=way, pay_type="one", date=datetime.date.today(), value=price.value)
+            pay = Peyment(client=client, way=way, pay_type="one", date=date, value=price.value)
             pay.save()
             return redirect('client', id=client_id)
+        
+        if type == "one_month":
+            price = Param.objects.get(key="price_one_month")
+            way = "card"
+            if data['role'] == "money":
+                way = "cash"
+            date = datetime.date(*(map(int, data['date'].split('-'))))
+
+            pay = Peyment(client=client, way=way, pay_type="one_month", date=date, value=price.value)
+            pay.save()
+            return redirect('client', id=client_id)
+        
+        if type == "group":
+            price = Param.objects.get(key="price_group")
+            way = "card"
+            if data['role'] == "money":
+                way = "cash"
+            date = datetime.date(*(map(int, data['date'].split('-'))))
+            group = SportGroup.objects.get(pk=int(data['group']))
+            pay = Peyment(client=client, way=way, pay_type="group", group=group, date=date, value=price.value)
+            pay.save()
+            return redirect('client', id=client_id)
+        
+        if type == "group_month":
+            price = Param.objects.get(key="price_group_month")
+            way = "card"
+            if data['role'] == "money":
+                way = "cash"
+            date = datetime.date(*(map(int, data['date'].split('-'))))
+            group = SportGroup.objects.get(pk=int(data['group']))
+            pay = Peyment(client=client, way=way, pay_type="group_month", group=group, date=date, value=price.value)
+            pay.save()
+            return redirect('client', id=client_id)
+
 
     if type == "one":
         price = Param.objects.get(key="prise_one")
 
         return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price})
+    
+    if type == "one_month":
+        price = Param.objects.get(key="price_one_month")
+
+        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price})
+    
+    if type == "group":
+        price = Param.objects.get(key="price_group")
+
+        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price, 'groups': client.groups.all()})
+    
+    if type == "group_month":
+        price = Param.objects.get(key="price_group_month")
+
+        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price, 'groups': client.groups.all()})

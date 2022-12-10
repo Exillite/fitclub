@@ -8,6 +8,9 @@
         {% if type == "one" %}
             <h3>Индивидуальное занятие</h3>
             <br>
+            <label for="clientname" style="font-size: 20px">Дата</label>
+            <input required name="date" class="form-control form-control-lg" type="date" id="date">
+            <br>
             <select name="role" class="custom-select custom-select-lg" required>
                 <option selected selected disabled value>-- выберите тип оплаты --</option>
                 <option value="money">Наличные</option>
@@ -16,8 +19,67 @@
             <br><br>
             <input name="price" required type="number" readonly class="form-control form-control-lg" id="groupname" placeholder="Введите сумму" value="{{ price.value }}">
         {% endif %}
-    </div>
+        
+        {% if type == "one_month" %}
+            <h3>Абонемент на индивидуальные занятия</h3>
+            <br>
+            <label for="clientname" style="font-size: 20px">Дата</label>
+            <input required name="date" class="form-control form-control-lg" type="date" id="date">
+            <br>
+            <select name="role" class="custom-select custom-select-lg" required>
+                <option selected selected disabled value>-- выберите тип оплаты --</option>
+                <option value="money">Наличные</option>
+                <option value="card">Карта</option>
+            </select>
+            <br><br>
+            <input name="price" required type="number" readonly class="form-control form-control-lg" id="groupname" placeholder="Введите сумму" value="{{ price.value }}">
+        {% endif %}
 
+        {% if type == "group" %}
+            <h3>Груповое занятие</h3>
+            <br>
+            <label for="clientname" style="font-size: 20px">Дата</label>
+            <input required name="date" class="form-control form-control-lg" type="date" id="date">
+            <br>
+            <select name="group" class="custom-select custom-select-lg" required>
+                <option selected selected disabled value>-- выберите группу --</option>
+                {% for g in groups %}
+                <option value="{{ g.pk }}">{{ g.name }}</option>
+                {% endfor %}
+            </select>
+            <br><br>
+            <select name="role" class="custom-select custom-select-lg" required>
+                <option selected selected disabled value>-- выберите тип оплаты --</option>
+                <option value="money">Наличные</option>
+                <option value="card">Карта</option>
+            </select>
+            <br><br>
+            <input name="price" required type="number" readonly class="form-control form-control-lg" id="groupname" placeholder="Введите сумму" value="{{ price.value }}">
+        {% endif %}
+
+        {% if type == "group_month" %}
+            <h3>Абонемент на груповое занятие</h3>
+            <br>
+            <label for="clientname" style="font-size: 20px">Дата</label>
+            <input required name="date" class="form-control form-control-lg" type="date" id="date">
+            <br>
+            <select name="group" class="custom-select custom-select-lg" required>
+                <option selected selected disabled value>-- выберите группу --</option>
+                {% for g in groups %}
+                <option value="{{ g.pk }}">{{ g.name }}</option>
+                {% endfor %}
+            </select>
+            <br><br>
+            <select name="role" class="custom-select custom-select-lg" required>
+                <option selected selected disabled value>-- выберите тип оплаты --</option>
+                <option value="money">Наличные</option>
+                <option value="card">Карта</option>
+            </select>
+            <br><br>
+            <input name="price" required type="number" readonly class="form-control form-control-lg" id="groupname" placeholder="Введите сумму" value="{{ price.value }}">
+        {% endif %}
+
+    </div>
         <button type="submit" class="btn-block btn-lg btn-primary">Внести платёж</button>
     </form>
 
