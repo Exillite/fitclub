@@ -212,7 +212,7 @@ def client_info(request, id):
 
     trenings = Trening.objects.filter(clients__id=client.pk).order_by('-day', '-start')
     payments = Peyment.objects.filter(client__pk=id)
-    return render(request=request, template_name="fitclub/client.html", context={'user': client, 'gruops': groups, 'trenings': trenings})
+    return render(request=request, template_name="fitclub/client.html", context={'user': client, 'gruops': groups, 'trenings': trenings, 'payments': payments})
 
 @csrf_exempt
 def add_new_time(request, group_id):

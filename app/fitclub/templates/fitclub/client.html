@@ -60,6 +60,7 @@
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
     <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Группы</a>
     <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Занятия</a>
+    <a class="nav-item nav-link" id="nav-pay-tab" data-toggle="tab" href="#nav-pay" role="tab" aria-controls="nav-pay" aria-selected="false">Оплаты</a>
     <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Настройки</a>
   </div>
 </nav>
@@ -81,6 +82,28 @@
       <br>
       {% for tr in trenings %}
         <a href="{% url 'trening' tr.pk %}" class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ tr.day|date:"D d M" }}: {{ tr.start|time:"H:i" }} - {% if tr.trening_type == "group" %}групповая{% else %}индивидуальная{% endif %}</a>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="tab-pane fade" id="nav-pay" role="tabpanel" aria-labelledby="nav-pay-tab">
+    <div class="list-group">
+      <br>
+      {% for pay in payments %}
+        {% if pay.pay_type == "one" %}
+          <p class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ pay.value }}₽ - Оплата индивидуального занятия {{ pay.date|date:"d.m.Y" }}</p>
+        {% endif %}
+
+        {% if pay.pay_type == "one_month" %}
+          <p class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ pay.value }}₽ - Оплата абонемента на индивидуальные занятия {{ pay.date|date:"d.m.Y" }}</p>
+        {% endif %}
+
+        {% if pay.pay_type == "group" %}
+          <p class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ pay.value }}₽ - Оплата группового занятия (<a href="{% url 'group' pay.group.pk %}">{{ pay.group.name }}</a>) {{ pay.date|date:"d.m.Y" }}</p>
+        {% endif %}
+
+        {% if pay.pay_type == "group_month" %}
+          <p class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ pay.value }}₽ - Оплата абонемента на групповые занятия (<a href="{% url 'group' pay.group.pk %}">{{ pay.group.name }}</a>) {{ pay.date|date:"d.m.Y" }}</p>
+        {% endif %}
       {% endfor %}
     </div>
   </div>
