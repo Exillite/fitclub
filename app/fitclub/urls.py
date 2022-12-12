@@ -24,4 +24,9 @@ urlpatterns = [
     path('calendar/<str:date>/<str:view>', calendar, name='calendar'),
     path('newper/<int:id>', new_per, name='newper'),
     path('newpay/<str:type>/<int:client_id>', new_pay, name='newpay'),
+    path('selary/', selary, name='selary'),
+    path('newselary/<int:id>', new_selary, name='newselary'),
+    path('selary/<int:month>/<int:year>/', prselary, name='prselary'),
+    path('dohod/', dohod, name='dohod'),
+    path('dohod/<int:month>/<int:year>/', prdohod, name='prdohod'),
 ]

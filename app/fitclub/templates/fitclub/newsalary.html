@@ -1,0 +1,14 @@
+{% extends 'fitclub/base.html' %}
+{% block content %}
+    <br>
+    <br>
+
+    <form method="post">
+        <div class="form-group">
+          <label for="groupname"><h3>Выплата</h3><h4>{{ user.first_name }} {{ user.last_name }}</h4></label>
+          <input name="col" required type="number" class="form-control form-control-lg" id="groupname" placeholder="Введите сумму">
+        </div>
+        <button type="submit" class="btn-block btn-lg btn-primary">Сохранить</button>
+    </form>
+
+{% endblock %}

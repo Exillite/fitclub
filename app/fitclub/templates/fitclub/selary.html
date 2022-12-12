@@ -1,0 +1,64 @@
+{% extends 'fitclub/base.html' %}
+{% block content %}
+    <form action="get">
+        <label for="clientname" style="font-size: 20px">Месяц</label>
+        <input required name="date" class="form-control form-control-lg" type="month" value="{{ ym }}" id="date" onchange="window.location.href = `/selary/${this.value.split('-')[1]}/${this.value.split('-')[0]}/`">  
+        
+
+        {% if pr %}
+        
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Имя</th>
+                <th scope="col">Фамилия</th>
+                <th scope="col">Начислено</th>
+                <th scope="col">Выплачено</th>
+
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for user in users %}
+            <tr>
+                <td>{{ user.0.first_name }}</td>
+                <td>{{ user.0.last_name }}</td>
+                <td>{{ user.1 }}</td>
+                <td>{{ user.2 }}</td>
+            </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+        
+        {% else %}
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Имя</th>
+                <th scope="col">Фамилия</th>
+                <th scope="col">Начислено</th>
+                <th scope="col">Выплачено</th>
+                <th scope="col">Долг</th>
+                <th scope="col">Вплатить</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for user in users %}
+            <tr>
+                <td>{{ user.0.first_name }}</td>
+                <td>{{ user.0.last_name }}</td>
+                <td>{{ user.1 }}</td>
+                <td>{{ user.2 }}</td>
+                <td>{{ user.3 }}</td>
+                <td><a href="{% url 'newselary' user.0.pk %}" class="btn-sm btn-primary" role="button">Новая выплата</a></td>
+            </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+        {% endif %}
+    </form>
+
+{% endblock %}

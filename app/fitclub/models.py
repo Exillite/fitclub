@@ -120,6 +120,6 @@ class Salary(models.Model):
         blank=True,
         related_name='who_trainer'
     )
-    date = models.DateField() 
-    accure = models.IntegerField()
+    date = models.DateField()
+    accure = models.IntegerField(blank=True)
     give = models.IntegerField()

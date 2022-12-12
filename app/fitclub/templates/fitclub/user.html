@@ -65,14 +65,16 @@
     <table class="table">
       <thead>
       <tr>
-          <th scope="col" class="col-3">Сумма</th>
-          <th scope="col" class="col-9">Занятие</th>
+          <th scope="col" class="col-2">Дата</th>
+          <th scope="col" class="col-2">Сумма</th>
+          <th scope="col" class="col-8">Занятие</th>
       </tr>
       </thead>
       <tbody>
 
       {% for s in sums %}
       <tr>
+          <td>{{ s.2|date:"D d M" }}</td>
           <td>{{ s.0 }}₽</td>
           <td>{{ s.1 }}</td>
       </tr>
@@ -80,8 +82,8 @@
 
       </tbody>
   </table>
-  <h4>Итог: {{ sm }}₽</h4>
-
+  <h5>Итог: {{ sm }}₽</h5>
+  
 
   </div>
   <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">

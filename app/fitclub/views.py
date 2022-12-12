@@ -129,21 +129,21 @@ def user_info(request, id):
     
     for t in mnthtren:
         if t.progul == True:
-            sums.append([sp, "Пропущенное занятие"])
+            sums.append([sp, "Пропущенное занятие", t.day])
             sm += sp
         elif t.helper == user:
-            sums.append([sa, "Помощь в качестве второго тренера"])
+            sums.append([sa, "Помощь в качестве второго тренера", t.day])
             sm += sa
         else:
             if t.trening_type == "group":
                 if t.col == 1:
-                    sums.append([ss, "Групповое занятие"])
+                    sums.append([ss, "Групповое занятие", t.day])
                     sm += ss
                 else:
-                    sums.append([sg, "Групповое занятие"])
+                    sums.append([sg, "Групповое занятие", t.day])
                     sm += sg
             else:
-                sums.append([so, "Персональная тренировка"])
+                sums.append([so, "Персональная тренировка", t.day])
                 sm += so
 
     return render(request=request, template_name="fitclub/user.html", context={'user': user, 'rl': rl, 'groups': groups, 'trenings': trenings, 'sums': sums, 'ym': f"{year}-{month}", 'sm': sm})
@@ -651,3 +651,138 @@ def new_pay(request, type, client_id):
         price = Param.objects.get(key="price_group_month")
 
         return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price, 'groups': client.groups.all()})
+
+
+def selary(request):
+    User = get_user_model()
+    users = User.objects.filter(
+    groups__name__in=['trener'])
+    
+    year = datetime.date.today().year
+    month = datetime.date.today().month
+    
+    usrs = []
+    for user in users:
+        selrs = Salary.objects.filter(user=user, date__year=str(year), date__month=str(month))
+        allselrs = Salary.objects.filter(user=user)
+        
+        gv = 0
+        for sl in selrs:
+            gv += sl.give
+        
+        allgv = 0
+        for sl in allselrs:
+            allgv += sl.give
+        
+        mnthtren = Trening.objects.filter(Q(trener=user) | Q(helper=user), day__year=str(year), day__month=str(month)).order_by('-day', '-start')
+
+        sp = Param.objects.get(key="sum_from_late").value
+        sa = Param.objects.get(key="sum_from_asist").value
+        ss = Param.objects.get(key="sum_from_single").value
+        sg = Param.objects.get(key="sum_from_group").value
+        so = Param.objects.get(key="sum_from_one").value
+        
+        sm = 0
+        
+        for t in mnthtren:
+            if t.progul == True:
+                sm += sp
+            elif t.helper == user:
+                sm += sa
+            else:
+                if t.trening_type == "group":
+                    if t.col == 1:
+                        sm += ss
+                    else:
+                        sm += sg
+                else:
+                    sm += so
+                    
+        
+        mnthtrena = Trening.objects.filter(Q(trener=user) | Q(helper=user))
+        sma = 0
+        
+        for t in mnthtrena:
+            if t.progul == True:
+                sma += sp
+            elif t.helper == user:
+                sma += sa
+            else:
+                if t.trening_type == "group":
+                    if t.col == 1:
+                        sma += ss
+                    else:
+                        sma += sg
+                else:
+                    sma += so
+
+        usrs.append([user, sm, gv, sma - allgv])
+    
+    return render(request=request, template_name="fitclub/selary.html", context={'users': usrs, 'ym': f"{year}-{month}"})
+
+
+@csrf_exempt
+def new_selary(request, id):
+    User = get_user_model()
+    user = User.objects.get(pk=id)
+    
+    if request.method == "POST":
+        data = request.POST
+        col = int(data['col'])
+        
+        selr = Salary(user=user, date=datetime.date.today(), give=col, accure=-1)
+        selr.save()  
+        return redirect('selary')   
+
+    return render(request=request, template_name="fitclub/newsalary.html", context={'user': user})
+
+
+def prselary(request, month, year):
+    User = get_user_model()
+    users = User.objects.filter(
+    groups__name__in=['trener'])
+    
+    if year == datetime.date.today().year and month == datetime.date.today().month:
+        return redirect('selary')
+    
+    usrs = []
+    for user in users:
+        selrs = Salary.objects.filter(user=user, date__year=str(year), date__month=str(month))
+        
+        gv = 0
+        for sl in selrs:
+            gv += sl.give
+        
+        mnthtren = Trening.objects.filter(Q(trener=user) | Q(helper=user), day__year=str(year), day__month=str(month)).order_by('-day', '-start')
+
+        sp = Param.objects.get(key="sum_from_late").value
+        sa = Param.objects.get(key="sum_from_asist").value
+        ss = Param.objects.get(key="sum_from_single").value
+        sg = Param.objects.get(key="sum_from_group").value
+        so = Param.objects.get(key="sum_from_one").value
+        
+        sm = 0
+        
+        for t in mnthtren:
+            if t.progul == True:
+                sm += sp
+            elif t.helper == user:
+                sm += sa
+            else:
+                if t.trening_type == "group":
+                    if t.col == 1:
+                        sm += ss
+                    else:
+                        sm += sg
+                else:
+                    sm += so
+
+        usrs.append([user, sm, gv])
+    
+    return render(request=request, template_name="fitclub/selary.html", context={'pr': True, 'users': usrs, 'ym': f"{year}-{month}"})
+
+
+def dohod(request):
+    
+    
+    return render(request=request, template_name="fitclub/dohod.html", context={})
