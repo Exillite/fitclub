@@ -783,6 +783,49 @@ def prselary(request, month, year):
 
 
 def dohod(request):
+    year = datetime.date.today().year
+    month = datetime.date.today().month
     
+    ins = 0
+    pays = Peyment.objects.filter(date__year=str(year), date__month=str(month))
+    for p in pays:
+        ins += p.value
+    
+    User = get_user_model()
+    users = User.objects.filter(
+    groups__name__in=['trener'])
+    zp = 0
+    for user in users:
+        selrs = Salary.objects.filter(user=user, date__year=str(year), date__month=str(month))
+        for sl in selrs:
+            zp += sl.give
+    
+    spnd = 0
+    spendings = Spending.objects.filter(date__year=str(year), date__month=str(month))
+    for s in spendings:
+        spnd += s.value
+    
+    return render(request=request, template_name="fitclub/dohod.html", context={'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': f"{year}-{month}"})
+
+
+def prdohod(request, month, year):
     
     return render(request=request, template_name="fitclub/dohod.html", context={})
+
+
+@csrf_exempt
+def new_spend(request):
+    
+    if request.method == "POST":
+        data = request.POST
+        
+        dt = datetime.date(*(map(int, data['date'].split('-'))))
+        
+        spend = Spending(key=data['name'], value=int(data['col']), spend_type="default", date=dt)
+        spend.save()
+        
+        return redirect('dohod')
+
+    td = datetime.date.today()
+
+    return render(request=request, template_name="fitclub/newspend.html", context={'ym': td})

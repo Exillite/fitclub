@@ -1,0 +1,20 @@
+{% extends 'fitclub/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<form method="post">
+<br>
+<br>
+<br>
+<h2>Запись расходов</h2>
+<input name="name" required type="text" class="form-control form-control-lg" id="naming" placeholder="Введите тип расходов">
+<br>
+<input name="col" required type="number" class="form-control form-control-lg" id="price" placeholder="Введите сумму">
+<br>
+<input required name="date" class="form-control form-control-lg" type="date" value="{{ ym|date:"Y-m-d" }}" id="date">
+<br>
+<button type="submit" class="btn-block btn-lg btn-primary">Сохранить</button>
+</form>
+
+{% endblock %}
