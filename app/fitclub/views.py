@@ -801,21 +801,20 @@ def dohod(request):
             zp += sl.give
     
     spnd = 0
-    spendings = Spending.objects.filter(date__year=str(year), date__month=str(month))
+    spendings = Spending.objects.filter(date__year=str(year), date__month=str(month)).order_by('-date')
     for s in spendings:
         spnd += s.value
     
     return render(request=request, template_name="fitclub/dohod.html", context={'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': f"{year}-{month}"})
 
 
-def prdohod(request, month, year):
+def prdohod(request, type, date):
     
     return render(request=request, template_name="fitclub/dohod.html", context={})
 
 
 @csrf_exempt
 def new_spend(request):
-    
     if request.method == "POST":
         data = request.POST
         
@@ -829,3 +828,21 @@ def new_spend(request):
     td = datetime.date.today()
 
     return render(request=request, template_name="fitclub/newspend.html", context={'ym': td})
+
+
+@csrf_exempt
+def edit_spend(request, id):
+    spd = Spending.objects.get(pk=id)
+    if request.method == "POST":
+        data = request.POST
+        
+        dt = datetime.date(*(map(int, data['date'].split('-'))))
+        
+        spd.key=data['name']
+        spd.value=int(data['col'])
+        spd.date=dt
+        spd.save()
+        
+        return redirect('dohod')
+
+    return render(request=request, template_name="fitclub/editspend.html", context={'spend': spd})

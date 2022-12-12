@@ -30,13 +30,14 @@
             <tr>
                 <td>{{ spend.value }}</td>
                 <td>{{ spend.key }}</td>
-                <td><a href="" class="btn-sm btn-primary" role="button">Редактировать</a></td>
+                <td><a href="{% url 'editspend' spend.pk %}" class="btn-sm btn-primary" role="button">Редактировать</a></td>
             </tr>
             {% endfor %}
 
             </tbody>
         </table>
-
+        <hr>
+        <a href="{% url 'newspend' %}" class="btn btn-primary" role="button">Добавить расходы</a>
     </form>
 
 {% endblock %}
