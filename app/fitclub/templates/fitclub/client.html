@@ -81,7 +81,7 @@
     <div class="list-group">
       <br>
       {% for tr in trenings %}
-        <a href="{% url 'trening' tr.pk %}" class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ tr.day|date:"D d M" }}: {{ tr.start|time:"H:i" }} - {% if tr.trening_type == "group" %}групповая{% else %}индивидуальная{% endif %}</a>
+        <p href="{% url 'trening' tr.0.pk %}" class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ tr.0.day|date:"D d M" }}: {{ tr.0.start|time:"H:i" }} - {% if tr.0.trening_type == "group" %}<a href="{% url 'group' tr.0.group.pk %}">групповое</a> занятие{% else %}индивидуальное занятие{% endif %} <block class="float-right success">{% if tr.1 %}<button type="button" disabled class="btn btn-success">Оплачено</button>{% else %}<button type="button" disabled class="btn btn-danger">Не оплачено</button>{% endif %}</block></p>
       {% endfor %}
     </div>
   </div>

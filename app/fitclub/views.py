@@ -307,9 +307,31 @@ def client_info(request, id):
 
         client.save()
 
-    trenings = Trening.objects.filter(clients__id=client.pk).order_by('-day', '-start')
+    trenings = Trening.objects.filter(clients__id=client.pk).order_by('day', '-start')
     payments = Peyment.objects.filter(client__pk=id)
-    return render(request=request, template_name="fitclub/client.html", context={'user': client, 'gruops': groups, 'trenings': trenings, 'payments': payments})
+    
+    plts = payments.all()
+    
+    trens = []
+    for tren in trenings:
+        print(type(plts))
+        isp = False
+        if tren.trening_type == "personal":
+            if plts.filter(pay_type="one_month", date__month=tren.day.month):
+                isp = True
+            elif plts.filter(pay_type="one", date=tren.day):
+                plts = plts.exclude(pk=plts.filter(pay_type="one", date=tren.day).first().pk)
+                isp = True
+        if tren.trening_type == "group":
+            if plts.filter(pay_type="group_month", date__month=tren.day.month):
+                isp = True
+            elif plts.filter(pay_type="group", date=tren.day):
+                plts = plts.exclude(pk=plts.filter(pay_type="group", date=tren.day).first().pk)
+                isp = True
+        
+        trens.append([tren, isp])
+    
+    return render(request=request, template_name="fitclub/client.html", context={'user': client, 'gruops': groups, 'trenings': trens, 'payments': payments})
 
 @csrf_exempt
 def add_new_time(request, group_id):
