@@ -993,3 +993,21 @@ def edit_income(request, id):
         return redirect('dohod')
 
     return render(request=request, template_name="fitclub/editspend.html", context={'spend': income, 'inc': True})
+
+
+@csrf_exempt
+def new_client(request):
+    if request.method == "POST":
+        data = request.POST
+        
+        client = Client(name=data['name'], surname=data['surname'])
+        if 'phone' in data:
+            client.phone = data['phone']
+        if 'email' in data:
+            client.email = data['email']
+        
+        client.save()
+        
+        return redirect('clients')
+    
+    return render(request=request, template_name="fitclub/new_client.html", context={})

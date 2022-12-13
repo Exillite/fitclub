@@ -1,0 +1,21 @@
+{% extends 'fitclub/base.html' %}
+{% block content %}
+    <br>
+    <br>
+
+    <form method="post">
+        <div class="form-group">
+          <label for="groupname"><h3>Добавить ученика</h3></label>
+          <input name="name" required type="text" class="form-control form-control-lg" id="namefield" placeholder="Введите имя">
+          <br>
+          <input name="surname" required type="text" class="form-control form-control-lg" id="surnamefield" placeholder="Введите фамилию">
+          <br>
+          <input name="phone" type="tel" class="form-control form-control-lg" id="phonefield" placeholder="Введите телефон">
+          <br>
+          <input name="email" type="email" class="form-control form-control-lg" id="emailfield" placeholder="Введите e-mail">
+          <br>
+        </div>
+        <button type="submit" class="btn-block btn-lg btn-primary">Добавить</button>
+    </form>
+
+{% endblock %}

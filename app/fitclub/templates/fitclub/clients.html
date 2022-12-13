@@ -1,5 +1,7 @@
 {% extends 'fitclub/base.html' %}
 {% block content %}
+    <button type="button" class="btn btn-primary btn-sm float-right" onclick="window.location = {% url 'newclient' %};">Зарегестрировать</button>
+    <br><br>
     <form action="get">
         <table class="table">
             <thead>
