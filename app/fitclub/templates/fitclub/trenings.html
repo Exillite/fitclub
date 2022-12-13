@@ -17,7 +17,7 @@
 
             {% for tr in trenings %}
             <tr>
-                <td>{{ tr.group.name }}</td>
+                <td>{% if tr.trening_type == "group" %}{{ tr.group.name }}{% else %}Индивидуальное занятие{% endif %}</td>
                 <td>{{ tr.day|date:"D d M" }}</td>
                 <td>{{ tr.start|time:"H:i" }} - {{ tr.end|time:"H:i" }}</td>
                 <td>{{ tr.col }}</td>
