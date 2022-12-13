@@ -836,8 +836,12 @@ def prdohod(request, type, date):
         spendings = Spending.objects.filter(date=dt).order_by('-date')
         for s in spendings:
             spnd += s.value
+        
+        incomes = Income.objects.filter(date=dt).order_by('-date')
+        for inc in incomes:
+            ins += inc.value
             
-        return render(request=request, template_name="fitclub/prdohod.html", context={'type': type, 'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': date})
+        return render(request=request, template_name="fitclub/prdohod.html", context={'incomes': incomes, 'type': type, 'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': date})
 
     if type == "week":
         dt = date.split('-')
@@ -861,8 +865,12 @@ def prdohod(request, type, date):
         spendings = Spending.objects.filter(date__range=[dts, dte]).order_by('-date')
         for s in spendings:
             spnd += s.value
+
+        incomes = Income.objects.filter(date__range=[dts, dte]).order_by('-date')
+        for inc in incomes:
+            ins += inc.value
             
-        return render(request=request, template_name="fitclub/prdohod.html", context={'type': type, 'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': date})
+        return render(request=request, template_name="fitclub/prdohod.html", context={'incomes': incomes, 'type': type, 'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': date})
     
     if type == "month":
         dt = date.split('-')
@@ -887,7 +895,11 @@ def prdohod(request, type, date):
         for s in spendings:
             spnd += s.value
             
-        return render(request=request, template_name="fitclub/prdohod.html", context={'type': type, 'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': date})
+        incomes = Income.objects.filter(date__year=str(year), date__month=str(month)).order_by('-date')
+        for inc in incomes:
+            ins += inc.value
+            
+        return render(request=request, template_name="fitclub/prdohod.html", context={'incomes': incomes, 'type': type, 'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': date})
 
 
 

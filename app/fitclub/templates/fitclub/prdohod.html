@@ -39,6 +39,32 @@
                 </tbody>
             </table>
             <hr>
+
+            <br>
+            <br>
+            <h4>Доходы</h4>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col" class="col-2">Сумма</th>
+                    <th scope="col" class="col-8">Доход</th>
+                    <th scope="col" class="col-2">Редактировать</th>
+                </tr>
+                </thead>
+                <tbody>
+    
+                {% for inc in incomes %}
+                <tr>
+                    <td>{{ inc.value }}</td>
+                    <td>{{ inc.key }}</td>
+                    <td><a href="{% url 'editincome' inc.pk %}" class="btn-sm btn-primary" role="button">Редактировать</a></td>
+                </tr>
+                {% endfor %}
+    
+                </tbody>
+            </table>
+            <hr>
+
         {% endif %}
 
         {% if type == "week" %}
