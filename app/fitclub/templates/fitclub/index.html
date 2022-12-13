@@ -1,0 +1,47 @@
+{% extends 'fitclub/base.html' %}
+{% block content %}
+    <br>
+    <h1>Меню</h1>
+    <br>
+    <div class="list-group">
+        <a href="{% url 'users' %}" class="list-group-item list-group-item-action active">
+            Сотрудники
+        </a>
+        <a href="admin/auth/user/add/" class="list-group-item list-group-item-action">Добавить нового</a>
+        <a href="{% url 'selary' %}" class="list-group-item list-group-item-action">Зарплаты</a>
+    </div>
+    <br>
+    <div class="list-group">
+        <a href="{% url 'groups' %}" class="list-group-item list-group-item-action active">
+            Группы
+        </a>
+        <a href="{% url 'addgroup' %}" class="list-group-item list-group-item-action">Добавить новую</a>
+        <a href="{% url 'weekplan' %}" class="list-group-item list-group-item-action">Расписание</a>
+        <a href="{% url 'trenings' %}" class="list-group-item list-group-item-action">Занятия</a>
+    </div>
+    <br>
+    <div class="list-group">
+        <a href="{% url 'clients' %}" class="list-group-item list-group-item-action active">
+            Ученики
+        </a>
+        <a href="{% url 'newclient' %}" class="list-group-item list-group-item-action">Добавить нового</a>
+        <a href="{% url 'trenings' %}" class="list-group-item list-group-item-action">Занятия</a>
+    </div>
+    <br>
+    <div class="list-group">
+        <a href="{% url 'calendar' "today" "month" %}" class="list-group-item list-group-item-action active">
+            Календарь
+        </a>
+    </div>
+    <br>
+    <div class="list-group">
+        <a href="{% url 'dohod' %}" class="list-group-item list-group-item-action active">
+            Статистика
+        </a>
+        <a href="{% url 'prdohod' "day" day %}" class="list-group-item list-group-item-action">За день</a>
+        <a href="{% url 'prdohod' "week" week %}" class="list-group-item list-group-item-action">За неделю</a>
+        <a href="{% url 'prdohod' "month" month %}" class="list-group-item list-group-item-action">За месяц</a>
+    </div>
+    <br>
+
+{% endblock %}

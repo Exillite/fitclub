@@ -36,10 +36,15 @@ def ini(request):
 
 
 def index(request):
-    
     if not request.user.is_authenticated:
         return redirect('login')
-    return HttpResponse(f"<h1>Hi, {request.user}!</h1>")
+    
+    year = datetime.date.today().year
+    month = datetime.date.today().month
+    day = datetime.date.today().day
+    week = datetime.date.today().isocalendar().week
+    
+    return render(request=request, template_name="fitclub/index.html", context={'day': f"{year}-{month}-{day}", 'week': f"{year}-W{week}", 'month': f"{year}-{month}"})
 
 
 def register_request(request):
