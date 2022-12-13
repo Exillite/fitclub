@@ -28,6 +28,7 @@ urlpatterns = [
     path('newselary/<int:id>', new_selary, name='newselary'),
     path('selary/<int:month>/<int:year>/', prselary, name='prselary'),
     path('dohod/', dohod, name='dohod'),
-    path('dohod/<int:month>/<int:year>/', prdohod, name='prdohod'),
+    path('dohod/<str:type>/<str:date>/', prdohod, name='prdohod'),
     path('newspend/', new_spend, name='newspend'),
+    path('editspend/<int:id>', edit_spend, name='editspend'),
 ]

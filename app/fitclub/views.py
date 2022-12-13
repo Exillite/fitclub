@@ -809,8 +809,54 @@ def dohod(request):
 
 
 def prdohod(request, type, date):
-    
-    return render(request=request, template_name="fitclub/dohod.html", context={})
+    if type == "day":
+        dt = datetime.date(*(map(int, date.split('-'))))
+        ins = 0
+        pays = Peyment.objects.filter(date=dt)
+        for p in pays:
+            ins += p.value
+        
+        User = get_user_model()
+        users = User.objects.filter(
+        groups__name__in=['trener'])
+        zp = 0
+        for user in users:
+            selrs = Salary.objects.filter(user=user, date=dt)
+            for sl in selrs:
+                zp += sl.give
+        
+        spnd = 0
+        spendings = Spending.objects.filter(date=dt).order_by('-date')
+        for s in spendings:
+            spnd += s.value
+            
+        return render(request=request, template_name="fitclub/prdohod.html", context={'type': type, 'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': date})
+
+    if type == "week":
+        dt = date.split('-')
+        dts = datetime.date.fromisocalendar(int(dt[0]), int(dt[1].replace('W', '')), 1).strftime("%Y-%m-%d")
+        dte = datetime.date.fromisocalendar(int(dt[0]), int(dt[1].replace('W', '')), 7).strftime("%Y-%m-%d")
+        ins = 0
+        pays = Peyment.objects.filter(date__range=[dts, dte])
+        for p in pays:
+            ins += p.value
+        
+        User = get_user_model()
+        users = User.objects.filter(
+        groups__name__in=['trener'])
+        zp = 0
+        for user in users:
+            selrs = Salary.objects.filter(user=user, date__range=[dts, dte])
+            for sl in selrs:
+                zp += sl.give
+        
+        spnd = 0
+        spendings = Spending.objects.filter(date__range=[dts, dte]).order_by('-date')
+        for s in spendings:
+            spnd += s.value
+            
+        return render(request=request, template_name="fitclub/prdohod.html", context={'type': type, 'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': date})
+
 
 
 @csrf_exempt
