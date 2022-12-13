@@ -856,6 +856,31 @@ def prdohod(request, type, date):
             spnd += s.value
             
         return render(request=request, template_name="fitclub/prdohod.html", context={'type': type, 'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': date})
+    
+    if type == "month":
+        dt = date.split('-')
+        month = dt[1]
+        year = dt[0]
+        ins = 0
+        pays = Peyment.objects.filter(date__year=str(year), date__month=str(month))
+        for p in pays:
+            ins += p.value
+        
+        User = get_user_model()
+        users = User.objects.filter(
+        groups__name__in=['trener'])
+        zp = 0
+        for user in users:
+            selrs = Salary.objects.filter(user=user, date__year=str(year), date__month=str(month))
+            for sl in selrs:
+                zp += sl.give
+        
+        spnd = 0
+        spendings = Spending.objects.filter(date__year=str(year), date__month=str(month)).order_by('-date')
+        for s in spendings:
+            spnd += s.value
+            
+        return render(request=request, template_name="fitclub/prdohod.html", context={'type': type, 'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': date})
 
 
 

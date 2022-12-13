@@ -3,7 +3,7 @@
     <form action="get">
 
         {% if type == "day" %}
-            <label for="clientname" style="font-size: 20px">Месяц</label>
+            <label for="clientname" style="font-size: 20px">День</label>
             <input required name="date" class="form-control form-control-lg" type="date" value="{{ ym }}" id="date" onchange="window.location.href = `/dohod/day/${this.value}/`">  
             <br>
 
@@ -42,8 +42,47 @@
         {% endif %}
 
         {% if type == "week" %}
-            <label for="clientname" style="font-size: 20px">Месяц</label>
+            <label for="clientname" style="font-size: 20px">Неделя</label>
             <input required name="date" class="form-control form-control-lg" type="week" value="{{ ym }}" id="date" onchange="window.location.href = `/dohod/week/${this.value}/`">  
+            <br>
+
+            <h4>Доход: {{ ins }}</h4>
+            <h4>Расходы: {{ outs }}</h4>
+            <h4>Прибыль: {{ prib }}</h4>
+            <br>
+            <h4>Расходы</h4>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col" class="col-2">Сумма</th>
+                    <th scope="col" class="col-8">Расход</th>
+                    <th scope="col" class="col-2">Редактировать</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <tr>
+                    <td>{{ zp }}</td>
+                    <td>Зарплаты тренеров</td>
+                    <td><a href="{% url 'selary' %}" class="btn-sm btn-primary" role="button">Редактировать</a></td>
+                </tr>
+                
+                {% for spend in spends %}
+                <tr>
+                    <td>{{ spend.value }}</td>
+                    <td>{{ spend.key }}</td>
+                    <td><a href="{% url 'editspend' spend.pk %}" class="btn-sm btn-primary" role="button">Редактировать</a></td>
+                </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+            <hr>
+        {% endif %}
+
+        {% if type == "month" %}
+            <label for="clientname" style="font-size: 20px">Месяц</label>
+            <input required name="date" class="form-control form-control-lg" type="month" value="{{ ym }}" id="date" onchange="window.location.href = `/dohod/month/${this.value}/`">  
             <br>
 
             <h4>Доход: {{ ins }}</h4>
