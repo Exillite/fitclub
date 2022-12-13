@@ -31,4 +31,6 @@ urlpatterns = [
     path('dohod/<str:type>/<str:date>/', prdohod, name='prdohod'),
     path('newspend/', new_spend, name='newspend'),
     path('editspend/<int:id>', edit_spend, name='editspend'),
+    path('newincome/', new_income, name='newincome'),
+    path('editincome/<int:id>', edit_income, name='editincome'),
 ]

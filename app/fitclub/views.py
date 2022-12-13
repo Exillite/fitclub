@@ -808,8 +808,11 @@ def dohod(request):
         spnd += s.value
     
     
+    incomes = Income.objects.filter(date__year=str(year), date__month=str(month)).order_by('-date')
+    for inc in incomes:
+        ins += inc.value
     
-    return render(request=request, template_name="fitclub/dohod.html", context={'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': f"{year}-{month}", 'day': f"{year}-{month}-{day}", 'week': f"{year}-W{week}", 'month': f"{year}-{month}"})
+    return render(request=request, template_name="fitclub/dohod.html", context={'incomes': incomes, 'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': f"{year}-{month}", 'day': f"{year}-{month}-{day}", 'week': f"{year}-W{week}", 'month': f"{year}-{month}"})
 
 
 def prdohod(request, type, date):
@@ -921,3 +924,38 @@ def edit_spend(request, id):
         return redirect('dohod')
 
     return render(request=request, template_name="fitclub/editspend.html", context={'spend': spd})
+
+
+@csrf_exempt
+def new_income(request):
+    if request.method == "POST":
+        data = request.POST
+        
+        dt = datetime.date(*(map(int, data['date'].split('-'))))
+        
+        income = Income(key=data['name'], value=int(data['col']), date=dt)
+        income.save()
+        
+        return redirect('dohod')
+
+    td = datetime.date.today()
+
+    return render(request=request, template_name="fitclub/newspend.html", context={'ym': td, 'inc': True})
+
+
+@csrf_exempt
+def edit_income(request, id):
+    income = Income.objects.get(pk=id)
+    if request.method == "POST":
+        data = request.POST
+        
+        dt = datetime.date(*(map(int, data['date'].split('-'))))
+        
+        income.key=data['name']
+        income.value=int(data['col'])
+        income.date=dt
+        income.save()
+        
+        return redirect('dohod')
+
+    return render(request=request, template_name="fitclub/editspend.html", context={'spend': income, 'inc': True})

@@ -7,8 +7,12 @@
 <br>
 <br>
 <br>
-<h2>Запись расходов</h2>
-<input name="name" required value="{{ spend.key }}" type="text" class="form-control form-control-lg" id="naming" placeholder="Введите тип расходов">
+{% if inc %}
+  <h2>Запись доходов</h2>
+{% else %}
+  <h2>Запись расходов</h2>
+{% endif %}
+<input name="name" required value="{{ spend.key }}" type="text" class="form-control form-control-lg" id="naming" placeholder="Введите описание">
 <br>
 <input name="col" required value="{{ spend.value }}" type="number" class="form-control form-control-lg" id="price" placeholder="Введите сумму">
 <br>

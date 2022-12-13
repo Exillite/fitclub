@@ -123,3 +123,9 @@ class Salary(models.Model):
     date = models.DateField()
     accure = models.IntegerField(blank=True)
     give = models.IntegerField()
+
+
+class Income(models.Model):
+    key = models.CharField(max_length=255)
+    value = models.IntegerField()
+    date = models.DateField(null=True, blank=True)
