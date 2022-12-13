@@ -785,6 +785,8 @@ def prselary(request, month, year):
 def dohod(request):
     year = datetime.date.today().year
     month = datetime.date.today().month
+    day = datetime.date.today().day
+    week = datetime.date.today().isocalendar().week
     
     ins = 0
     pays = Peyment.objects.filter(date__year=str(year), date__month=str(month))
@@ -805,7 +807,9 @@ def dohod(request):
     for s in spendings:
         spnd += s.value
     
-    return render(request=request, template_name="fitclub/dohod.html", context={'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': f"{year}-{month}"})
+    
+    
+    return render(request=request, template_name="fitclub/dohod.html", context={'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': f"{year}-{month}", 'day': f"{year}-{month}-{day}", 'week': f"{year}-W{week}", 'month': f"{year}-{month}"})
 
 
 def prdohod(request, type, date):

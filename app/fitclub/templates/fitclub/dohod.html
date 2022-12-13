@@ -1,8 +1,16 @@
 {% extends 'fitclub/base.html' %}
 {% block content %}
     <form action="get">
-        <label for="clientname" style="font-size: 20px">Месяц</label>
-        <input required name="date" class="form-control form-control-lg" type="month" value="{{ ym }}" id="date" onchange="window.location.href = `/selary/${this.value.split('-')[1]}/${this.value.split('-')[0]}/`">  
+        <div class="dropdown">
+            <button class="btn btn-info dropdown-toggle float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" style="margin-bottom: 5px; margin-left: auto;" aria-expanded="false">
+              Просмотр статистики
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="{% url 'prdohod' "day" day %}">За день</a>
+              <a class="dropdown-item" href="{% url 'prdohod' "week" week %}">За неделю</a>
+              <a class="dropdown-item" href="{% url 'prdohod' "month" month %}">За месяц</a>
+            </div>
+        </div>
         <br>
 
         <h4>Доход: {{ ins }}</h4>
