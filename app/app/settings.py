@@ -36,7 +36,6 @@ SITE_ID=1
 
 INSTALLED_APPS = [
     'jazzmin',
-    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -134,3 +133,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "mediafiles"
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Администрирование",
+    "show_sidebar": True,
+    "topmenu_links": [
+        {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Открыть сайт", "url": "/"},
+        {"model": "auth.User"},
+    ],
+}

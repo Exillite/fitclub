@@ -110,6 +110,10 @@ class IncomeAdmin(admin.ModelAdmin):
     search_fields = ('key', 'value')
 
 
+
+admin.site.site_title = 'Админ-панель'
+admin.site.site_header = 'Админ-панель'
+
 admin.site.register(SportGroup, SportGroupAdmin)
 # admin.site.register(GroupTime)
 admin.site.register(Trening, TreningAdmin)
