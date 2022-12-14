@@ -43,5 +43,13 @@
         <a href="{% url 'prdohod' "month" month %}" class="list-group-item list-group-item-action">За месяц</a>
     </div>
     <br>
+    <div class="list-group">
+        <a href="admin" class="list-group-item list-group-item-action active">
+            Панель администратора
+        </a>
+    </div>
+
+    <br><br><br>
+    <a class="btn btn-block btn-danger" href="{% url 'logout' %}" role="button">Выйти из аккаунта</a>
 
 {% endblock %}

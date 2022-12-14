@@ -5,6 +5,7 @@ from django.contrib.auth.models import Group, User
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
 from .forms import NewUserForm
 from .models import *
@@ -23,6 +24,9 @@ DAYS = [
 ]
 
 def ini(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
     ret = "OK\n"
 
     group1 = Group(name = "admin")
@@ -79,6 +83,12 @@ def login_request(request):
     form = AuthenticationForm()
     return render(request=request, template_name="fitclub/login.html", context={"login_form": form})
 
+
+def logoutpage(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    logout(request)
+    return redirect('login')
 
 def admin_users(request):
     if not request.user.is_authenticated:
