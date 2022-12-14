@@ -101,6 +101,8 @@ def admin_users(request):
 
 @csrf_exempt
 def user_info(request, id):
+    if not request.user.is_authenticated:
+        return redirect('login')
     User = get_user_model()
     user = User.objects.get(pk=id)
 
@@ -166,6 +168,8 @@ def user_info(request, id):
 
 @csrf_exempt
 def user_info_zp(request, id, month, year):
+    if not request.user.is_authenticated:
+        return redirect('login')
     User = get_user_model()
     user = User.objects.get(pk=id)
 
@@ -230,6 +234,8 @@ def user_info_zp(request, id, month, year):
 def admin_groups(request):
     if not request.user.is_authenticated:
         return redirect('login')
+    if not request.user.is_authenticated:
+        return redirect('login')
     
     groups = SportGroup.objects.all()
 
@@ -237,6 +243,8 @@ def admin_groups(request):
 
 @csrf_exempt
 def add_group(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     if request.method == "POST":
         data = request.POST
         group_name = data.get("groupname")
@@ -249,6 +257,8 @@ def add_group(request):
 
 @csrf_exempt
 def group_info(request, id):
+    if not request.user.is_authenticated:
+        return redirect('login')
     User = get_user_model()
     if request.method == "POST":
         data = request.POST
@@ -298,6 +308,8 @@ def group_info(request, id):
 def admin_clients(request):
     if not request.user.is_authenticated:
         return redirect('login')
+    if not request.user.is_authenticated:
+        return redirect('login')
 
     clients = Client.objects.all()
 
@@ -305,6 +317,8 @@ def admin_clients(request):
 
 @csrf_exempt
 def client_info(request, id):
+    if not request.user.is_authenticated:
+        return redirect('login')
     client = Client.objects.get(pk=id)
     groups = SportGroup.objects.all()
     if request.method == "POST":
@@ -350,6 +364,8 @@ def client_info(request, id):
 
 @csrf_exempt
 def add_new_time(request, group_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
     group = SportGroup.objects.get(pk=group_id)
 
     if request.method == "POST":
@@ -367,6 +383,8 @@ def add_new_time(request, group_id):
 
 @csrf_exempt
 def edit_time(request, time_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
     time = GroupTime.objects.get(pk=time_id)
     group = SportGroup.objects.get(pk=time.group.pk)
 
@@ -412,6 +430,8 @@ def edit_time(request, time_id):
 
 @csrf_exempt
 def new_trening(request, group_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
     User = get_user_model()
     group = SportGroup.objects.get(pk=group_id)
     clients = Client.objects.filter(groups=group.pk)
@@ -457,12 +477,16 @@ def new_trening(request, group_id):
 
 
 def admin_trenings(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     treinings = Trening.objects.all().order_by('-day', '-start')
 
     return render(request=request, template_name='fitclub/trenings.html', context={'trenings': treinings})
 
 @csrf_exempt
 def info_trenings(request, id):
+    if not request.user.is_authenticated:
+        return redirect('login')
     trening = Trening.objects.get(pk=id)
     if trening.trening_type == "group":
         clients = Client.objects.filter(groups=trening.group.pk)
@@ -559,6 +583,8 @@ def info_trenings(request, id):
 
 
 def week_plan(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     
     times = GroupTime.objects.all()
 
@@ -566,6 +592,8 @@ def week_plan(request):
 
 
 def calendar(request, date='today', view='month'):
+    if not request.user.is_authenticated:
+        return redirect('login')
     trenings = Trening.objects.all()
     if date == 'today':
         date = datetime.date.today().strftime("%Y-%m-%d")
@@ -578,6 +606,8 @@ def calendar(request, date='today', view='month'):
 
 @csrf_exempt
 def new_per(request, id):
+    if not request.user.is_authenticated:
+        return redirect('login')
     User = get_user_model()
     client = Client.objects.get(pk=id)
     if request.method == "POST":
@@ -620,6 +650,8 @@ def new_per(request, id):
 
 @csrf_exempt
 def new_pay(request, type, client_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
     client = Client.objects.get(pk=client_id)
     if request.method == "POST":
         data = request.POST
@@ -691,6 +723,8 @@ def new_pay(request, type, client_id):
 
 
 def selary(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     User = get_user_model()
     users = User.objects.filter(
     groups__name__in=['trener'])
@@ -760,6 +794,8 @@ def selary(request):
 
 @csrf_exempt
 def new_selary(request, id):
+    if not request.user.is_authenticated:
+        return redirect('login')
     User = get_user_model()
     user = User.objects.get(pk=id)
     
@@ -775,6 +811,8 @@ def new_selary(request, id):
 
 
 def prselary(request, month, year):
+    if not request.user.is_authenticated:
+        return redirect('login')
     User = get_user_model()
     users = User.objects.filter(
     groups__name__in=['trener'])
@@ -820,6 +858,8 @@ def prselary(request, month, year):
 
 
 def dohod(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     year = datetime.date.today().year
     month = datetime.date.today().month
     day = datetime.date.today().day
@@ -853,6 +893,8 @@ def dohod(request):
 
 
 def prdohod(request, type, date):
+    if not request.user.is_authenticated:
+        return redirect('login')
     if type == "day":
         dt = datetime.date(*(map(int, date.split('-'))))
         ins = 0
@@ -942,6 +984,8 @@ def prdohod(request, type, date):
 
 @csrf_exempt
 def new_spend(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     if request.method == "POST":
         data = request.POST
         
@@ -959,6 +1003,8 @@ def new_spend(request):
 
 @csrf_exempt
 def edit_spend(request, id):
+    if not request.user.is_authenticated:
+        return redirect('login')
     spd = Spending.objects.get(pk=id)
     if request.method == "POST":
         data = request.POST
@@ -977,6 +1023,8 @@ def edit_spend(request, id):
 
 @csrf_exempt
 def new_income(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     if request.method == "POST":
         data = request.POST
         
@@ -994,6 +1042,8 @@ def new_income(request):
 
 @csrf_exempt
 def edit_income(request, id):
+    if not request.user.is_authenticated:
+        return redirect('login')
     income = Income.objects.get(pk=id)
     if request.method == "POST":
         data = request.POST
@@ -1012,6 +1062,8 @@ def edit_income(request, id):
 
 @csrf_exempt
 def new_client(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     if request.method == "POST":
         data = request.POST
         
