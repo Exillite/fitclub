@@ -49,7 +49,7 @@
       end: '2022-11-{{ t.day|add:20 }}T{{ t.end|time:"H:i" }}:00',
       state: null,
       location: '<a href="{% url 'group' t.group.pk %}"> Группа</a>',
-      attendees: ['<a href="{% url 'user' t.group.trener.pk %}">{{ t.group.trener.last_name }} {{ t.group.trener.first_name|make_list|first }}.</a>']
+      attendees: ['<a>{{ t.group.trener.last_name }} {{ t.group.trener.first_name|make_list|first }}.</a>']
     },
   {% endfor %}
 
