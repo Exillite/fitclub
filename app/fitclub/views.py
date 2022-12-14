@@ -338,9 +338,9 @@ def client_info(request, id):
                 plts = plts.exclude(pk=plts.filter(pay_type="one", date=tren.day).first().pk)
                 isp = True
         if tren.trening_type == "group":
-            if plts.filter(pay_type="group_month", date__month=tren.day.month):
+            if plts.filter(group=tren.group, pay_type="group_month", date__month=tren.day.month):
                 isp = True
-            elif plts.filter(pay_type="group", date=tren.day):
+            elif plts.filter(group=tren.group, pay_type="group", date=tren.day):
                 plts = plts.exclude(pk=plts.filter(pay_type="group", date=tren.day).first().pk)
                 isp = True
         
@@ -640,7 +640,7 @@ def new_pay(request, type, client_id):
             way = "card"
             if data['role'] == "money":
                 way = "cash"
-            date = datetime.date(*(map(int, data['date'].split('-'))))
+            date = datetime.date(*(map(int, data['date'].split('-'))), 1)
 
             pay = Peyment(client=client, way=way, pay_type="one_month", date=date, value=price.value)
             pay.save()
@@ -662,7 +662,7 @@ def new_pay(request, type, client_id):
             way = "card"
             if data['role'] == "money":
                 way = "cash"
-            date = datetime.date(*(map(int, data['date'].split('-'))))
+            date = datetime.date(*(map(int, data['date'].split('-'))), 1)
             group = SportGroup.objects.get(pk=int(data['group']))
             pay = Peyment(client=client, way=way, pay_type="group_month", group=group, date=date, value=price.value)
             pay.save()
