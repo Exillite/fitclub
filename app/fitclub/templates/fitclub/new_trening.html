@@ -80,16 +80,103 @@
   </div>
   <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
     <br>
-    {% for cl in clients %}
-        <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="clientgroup{{ cl.pk }}" value="on" id="cgroup">
-        <label class="form-check-label" style="font-size: 28px;" for="cgroup">
-            {{ cl.name }} {{ cl.surname }}
-        </label>
-        </div>
-    {% endfor %}
+    <p title="
+
+Н - отсутствует
+Б - болеет
+О - отпуск/уехал
+У - увожительная причина
++ - присутствует" style="font-size: 21px">🛈</p>
+{% comment %}
+	    <p>Н - отсутствует</p>
+	    <p>Б - болеет</p>
+	    <p>П - прогул</p>
+	    <p>О - отпуск/уехал</p>
+	    <p>У - увожительная причина</p>
+	    <p>+ - присутствует</p>
+{% endcomment %}
+    <div id="clxx">
+      {% for cl in clients %}
+          <div class="form-check">
+          <select name="clientgroup{{ cl.pk }}" id="cgroup" class="" style="font-size: 20px">
+
+            <option selected value="0">Н</option>
+            <option value="1">Б</option>
+            <option value="2">О</option>
+            <option value="3">У</option>
+            <option value="4">+</option>
+            
+          </select>
+
+          <label class="form-check-labell" style="font-size: 28px;" for="cgroup">
+              {{ cl.name }} {{ cl.surname }}
+          </label>
+          </div>
+      {% endfor %}
+    </div>
+    <br>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="showAllClients()">Показать ещё</button>
+    <br>
+  <div id="allcl" hidden>
+    
+    <br>
+    <div class="search-container">
+      <input type="text" placeholder="Искать..." id="searchInput" onkeyup="searchClients()">
+    </div>
+    
+    <div class="">
+        {% for cl in allcl %}
+            <div class="form-check" id="cl">
+              <select name="clientgclients-containerroup{{ cl.pk }}" id="cgroup" class="" style="font-size: 20px">
+
+                <option selected value="0">Н</option>
+                <option value="1">Б</option>
+                <option value="2">О</option>
+                <option value="3">У</option>
+                <option value="4">+</option>
+                
+              </select>
+              <label class="form-check-label" style="font-size: 28px;" for="cgroup">
+                  {{ cl.name }} {{ cl.surname }}
+              </label>
+            </div>
+        {% endfor %}
+    </div>
+  
+    <script>
+        function searchClients() {
+            // Get the search input value
+            var searchValue = document.getElementById("searchInput").value;
+            var clients = document.getElementsByClassName("form-check-label");
+            // Filter the clients based on the search value
+            var filteredClients = Array.prototype.filter.call(clients, function(client) {
+                return client.textContent.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1;
+            });
+            // Hide all clients
+            for (var i = 0; i < clients.length; i++) {
+                clients[i].parentElement.style.display = "none";
+            }
+            // Show the filtered clients
+            for (var i = 0; i < filteredClients.length; i++) {
+                filteredClients[i].parentElement.style.display = "block";
+            }
+        }
+
+        function showAllClients() {
+          var allcl = document.getElementById("allcl");
+          allcl.hidden = false;
+        }
+    </script>
+
+  </div>
+
   </div>
 </div>
 </form>
 
+<script>
+
+
+
+</script>
 {% endblock %}

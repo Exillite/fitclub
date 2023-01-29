@@ -19,7 +19,11 @@
 <div class="card">
   <div class="card-body">
     <div class="row align-items-center h-100">
-        <h1>Индивидуальное занятие {{ client.name }} {{ client.surname }}</h1>
+      {% if ismas %}
+      <h1>Массаж {{ client.name }} {{ client.surname }}</h1>
+      {% else %}
+      <h1>Индивидуальное занятие {{ client.name }} {{ client.surname }}</h1>
+      {% endif %}
     </div>
   </div>
 </div>
@@ -40,6 +44,8 @@
     <input required name="starttime" id="timestart" type="time" required style="margin-right: 100px; margin-bottom: 20px;"/>
     <label for="timeend" style="font-size: 20px; margin-right: 8px;">Врмея окончания</label>
     <input required name="endtime" id="timeend" type="time" value=""  class="margin-bottom: 20px" required/>
+
+    {% if not ismas %}
     <br>
       <div class="form-check">
         <input class="form-check-input" type="checkbox" name="progul" value="on" id="cgroup">
@@ -47,7 +53,7 @@
             Прогул
         </label>
       </div>
-    <br>
+    {% endif %}
     <br>
     <label for="trener" style="font-size: 20px">Тренер</label>
     <select required name="trener" id="trener" class="form-control" style="font-size: 20px">
@@ -71,7 +77,18 @@
     </select>
     
     <br>
-    <br>
+    
+    {% if ismas %}
+    <label for="mastype" style="font-size: 20px">Тип массажа</label>
+    <select name="mastype" id="mastype" class="form-control" style="font-size: 20px" required>
+
+        <option disabled selected value> -- Выберите тип массажа -- </option>
+        {% for t in mt %}
+            <option value="{{ t.pk }}">{{ t.title }}</option>
+        {% endfor %}
+
+    </select>
+    {% else %}
     <label for="helper" style="font-size: 20px">Помощник тренера <div style="font-size: 12px">(не обязательно)</div></label>
     <select name="helper" id="helper" class="form-control" style="font-size: 20px">
 
@@ -81,7 +98,7 @@
         {% endfor %}
 
     </select>
-    
+    {% endif %}
 
   </div>
 </div>

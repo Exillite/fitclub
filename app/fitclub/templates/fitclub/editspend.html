@@ -14,7 +14,7 @@
 {% endif %}
 <input name="name" required value="{{ spend.key }}" type="text" class="form-control form-control-lg" id="naming" placeholder="Введите описание">
 <br>
-<input name="col" required value="{{ spend.value }}" type="number" class="form-control form-control-lg" id="price" placeholder="Введите сумму">
+<input name="col" required value="{{ spend.value|stringformat:".2f" }}" type="number" class="form-control form-control-lg" id="price" placeholder="Введите сумму">
 <br>
 <input required name="date" class="form-control form-control-lg" type="date" value="{{ spend.date|date:"Y-m-d" }}" id="date">
 <br>

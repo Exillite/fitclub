@@ -1,0 +1,32 @@
+{% extends 'fitclub/base.html' %}
+{% block content %}
+    <div class="row">
+        <button type="button" class="btn btn-primary" style="margin-left: auto" onclick="window.location = {% url 'newmastp' %};">Добавить</button>
+    </div>
+    <br>
+    <form action="get">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Тип</th>
+                <th scope="col">Стоимость</th>
+                <th scope="col">Сумма массажисту</th>
+                <th scope="col">Редактировать</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for t in types %}
+            <tr>
+                <td>{{ t.title }}</td>
+                <td>{{ t.prise|stringformat:".2f"}}</td>
+                <td>{{ t.trener_sum|stringformat:".2f"}}</td>
+                <td><a href="{% url 'mastpedit' t.pk %}" class="btn-sm btn-primary" role="button">Редактировать</a></td>
+            </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+    </form>
+
+{% endblock %}

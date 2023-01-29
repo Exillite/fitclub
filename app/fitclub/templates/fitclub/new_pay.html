@@ -5,34 +5,73 @@
     <form method="post">
     <div class="form-group">
         <label for="groupname"><h3>Оплата {{ client.name }} {{ client.surname }}</h3></label>
+        {% if type == "massage" %}
+            <h3>{{ title }}</h3>
+            <br>
+            <label for="clientname" style="font-size: 20px">Дата</label>
+            <input required name="date" class="form-control form-control-lg" type="date" id="date">
+            <br>
+            
+            <input name="col" required min="1" type="number" class="form-control form-control-lg" id="groupname" placeholder="Введите количество занятий" value="1" 
+            onchange="document.getElementById('pricefield').value = document.getElementById('role').value == 'site' ? this.value * {{ price|stringformat:".2f" }} * {{ percent|stringformat:".2f" }} : this.value *{{ price|stringformat:".2f" }}">
+            <br>
+            <select name="role" id="role" class="custom-select custom-select-lg"
+             required onchange="document.getElementById('pricefield').value = this.value == 'site' ?  document.getElementById('groupname').value * {{ price|stringformat:".2f" }} * {{ percent|stringformat:".2f" }} : document.getElementById('groupname').value *{{ price|stringformat:".2f" }}">
+                <option selected selected disabled value>-- выберите тип оплаты --</option>
+                <option value="money">Наличные</option>
+                <option value="card">Карта</option>
+            </select>
+            <br><br>
+            
+            <input name="price" required type="number" class="form-control form-control-lg" id="pricefield" placeholder="Введите сумму" value="{{ price|stringformat:".2f" }}">
+        {% endif %}
+
         {% if type == "one" %}
             <h3>Индивидуальное занятие</h3>
             <br>
             <label for="clientname" style="font-size: 20px">Дата</label>
             <input required name="date" class="form-control form-control-lg" type="date" id="date">
             <br>
-            <select name="role" class="custom-select custom-select-lg" required>
+            
+            <input name="col" required min="1" type="number" class="form-control form-control-lg" id="groupname" placeholder="Введите количество занятий" value="1" 
+            onchange="document.getElementById('pricefield').value = document.getElementById('role').value == 'site' ? this.value * {{ price.value|stringformat:".2f" }} * {{ percent|stringformat:".2f" }} : this.value *{{ price.value|stringformat:".2f" }}">
+            <br>
+            <select name="role" id="role" class="custom-select custom-select-lg"
+             required onchange="document.getElementById('pricefield').value = this.value == 'site' ?  document.getElementById('groupname').value * {{ price.value|stringformat:".2f" }} * {{ percent|stringformat:".2f" }} : document.getElementById('groupname').value *{{ price.value|stringformat:".2f" }}">
                 <option selected selected disabled value>-- выберите тип оплаты --</option>
                 <option value="money">Наличные</option>
                 <option value="card">Карта</option>
+                <option value="site">Через сайт</option>
             </select>
             <br><br>
-            <input name="price" required type="number" readonly class="form-control form-control-lg" id="groupname" placeholder="Введите сумму" value="{{ price.value }}">
+            
+            <input name="price" required type="number" class="form-control form-control-lg" id="pricefield" placeholder="Введите сумму" value="{{ price.value|stringformat:".2f" }}">
         {% endif %}
         
         {% if type == "one_month" %}
             <h3>Абонемент на индивидуальные занятия</h3>
             <br>
-            <label for="clientname" style="font-size: 20px">Дата</label>
-            <input required name="date" class="form-control form-control-lg" type="month" id="date">
+            <label for="clientname" style="font-size: 20px">Дата оплаты</label>
+            <input required name="date" class="form-control form-control-lg" type="date" id="date1">
             <br>
-            <select name="role" class="custom-select custom-select-lg" required>
+            <label for="clientname" style="font-size: 20px">Дата начала</label>
+            <input required name="startdate" class="form-control form-control-lg" type="date" id="date" onchange="setEndDate()">
+            <br>
+            <label for="clientname" style="font-size: 20px">Дата окончания</label>
+            <input required name="enddate" class="form-control form-control-lg" type="date" id="enddate" onchange="setStartDateMax()">
+            <br>
+            <label for="clientname" style="font-size: 20px">Количество занятий</label>
+            <input name="col" required min="1" type="number" class="form-control form-control-lg" id="groupname" placeholder="Введите количество занятий" value="1" 
+            onchange="document.getElementById('pricefield').value = this.value *{{ price.value|stringformat:".2f" }}">
+            <br>
+            <select name="role" id="role" class="custom-select custom-select-lg" required>
                 <option selected selected disabled value>-- выберите тип оплаты --</option>
                 <option value="money">Наличные</option>
                 <option value="card">Карта</option>
+                <option value="site">Через сайт</option>
             </select>
             <br><br>
-            <input name="price" required type="number" readonly class="form-control form-control-lg" id="groupname" placeholder="Введите сумму" value="{{ price.value }}">
+            <input name="price"  min="1" step="0.01" required type="number" class="form-control form-control-lg" id="pricefield" placeholder="Введите сумму" value="{{ price.value|stringformat:".2f" }}">
         {% endif %}
 
         {% if type == "group" %}
@@ -41,46 +80,79 @@
             <label for="clientname" style="font-size: 20px">Дата</label>
             <input required name="date" class="form-control form-control-lg" type="date" id="date">
             <br>
-            <select name="group" class="custom-select custom-select-lg" required>
-                <option selected selected disabled value>-- выберите группу --</option>
-                {% for g in groups %}
-                <option value="{{ g.pk }}">{{ g.name }}</option>
-                {% endfor %}
-            </select>
-            <br><br>
-            <select name="role" class="custom-select custom-select-lg" required>
+            <input name="col" required min="1" type="number" class="form-control form-control-lg" id="groupname" placeholder="Введите количество занятий" value="1" 
+            onchange="document.getElementById('pricefield').value = document.getElementById('role').value == 'site' ? this.value * {{ price.value|stringformat:".2f" }} * {{ percent|stringformat:".2f" }} : this.value *{{ price.value|stringformat:".2f" }}">
+            <br>
+            <select name="role" id="role" class="custom-select custom-select-lg"
+             required onchange="document.getElementById('pricefield').value = this.value == 'site' ?  document.getElementById('groupname').value * {{ price.value|stringformat:".2f" }} * {{ percent|stringformat:".2f" }} : document.getElementById('groupname').value *{{ price.value|stringformat:".2f" }}">
                 <option selected selected disabled value>-- выберите тип оплаты --</option>
                 <option value="money">Наличные</option>
                 <option value="card">Карта</option>
+                <option value="site">Через сайт</option>
             </select>
             <br><br>
-            <input name="price" required type="number" readonly class="form-control form-control-lg" id="groupname" placeholder="Введите сумму" value="{{ price.value }}">
+            <input name="price" required type="number" class="form-control form-control-lg" id="pricefield" placeholder="Введите сумму" value="{{ price.value|stringformat:".2f" }}">
         {% endif %}
 
         {% if type == "group_month" %}
             <h3>Абонемент на груповое занятие</h3>
             <br>
-            <label for="clientname" style="font-size: 20px">Дата</label>
-            <input required name="date" class="form-control form-control-lg" type="month" id="date">
+            <label for="clientname" style="font-size: 20px">Дата оплаты</label>
+            <input required name="date" class="form-control form-control-lg" type="date" id="date1">
             <br>
-            <select name="group" class="custom-select custom-select-lg" required>
-                <option selected selected disabled value>-- выберите группу --</option>
-                {% for g in groups %}
-                <option value="{{ g.pk }}">{{ g.name }}</option>
-                {% endfor %}
-            </select>
-            <br><br>
-            <select name="role" class="custom-select custom-select-lg" required>
+            <label for="clientname" style="font-size: 20px">Дата начала</label>
+            <input required name="startdate" class="form-control form-control-lg" type="date" id="date" onchange="setEndDate()">
+            <br>
+            <label for="clientname" style="font-size: 20px">Дата окончания</label>
+            <input required name="enddate" class="form-control form-control-lg" type="date" id="enddate" onchange="setStartDateMax()">
+            <br>
+            <label for="clientname" style="font-size: 20px">Количество занятий</label>
+            <br>
+            <input name="col" required min="1" type="number" class="form-control form-control-lg" id="groupname" placeholder="Введите количество занятий" value="1" 
+            onchange="document.getElementById('pricefield').value = this.value *{{ price.value|stringformat:".2f" }}">
+            <br>
+            <select name="role" id="role" class="custom-select custom-select-lg"
+             required>
                 <option selected selected disabled value>-- выберите тип оплаты --</option>
                 <option value="money">Наличные</option>
                 <option value="card">Карта</option>
+                <option value="site">Через сайт</option>
             </select>
             <br><br>
-            <input name="price" required type="number" readonly class="form-control form-control-lg" id="groupname" placeholder="Введите сумму" value="{{ price.value }}">
+            <input name="price" min="1" required type="number" class="form-control form-control-lg" id="pricefield" placeholder="Введите сумму" value="{{ price.value|stringformat:".2f" }}">
         {% endif %}
 
     </div>
         <button type="submit" class="btn-block btn-lg btn-primary">Внести платёж</button>
     </form>
 
+
+    <script>
+        var today = new Date();
+        document.getElementById("date").value = today.toISOString().substring(0, 10);
+        var today = new Date();
+        document.getElementById("date1").value = today.toISOString().substring(0, 10);
+
+        function setEndDate() {
+            var startDate = document.getElementById("date").value;
+            var startDateObject = new Date(startDate);          
+            var endDateObject = new Date(startDateObject.getTime() + (37 * 24 * 60 * 60 * 1000));
+            var endDate = endDateObject.toISOString().substring(0, 10);
+            document.getElementById("enddate").value = endDate;
+        }
+
+
+        function setEndDateMin() {
+            var startDate = document.getElementById("date").value;
+            document.getElementById("enddate").min = startDate;
+        }
+
+        function setStartDateMax() {
+            var endDate = document.getElementById("enddate").value;
+            document.getElementById("date").max = endDate;
+        }
+
+        setEndDate()
+
+    </script>
 {% endblock %}

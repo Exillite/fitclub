@@ -1,5 +1,6 @@
 {% extends 'fitclub/base.html' %}
 {% load static %}
+{% load poll_extras %}
 
 {% block content %}
 
@@ -19,11 +20,15 @@
 <div class="card">
   <div class="card-body">
     <div class="row align-items-center h-100">
+      {% if tt == "massage" %}
+        <h1>Массаж - {{ client.name }} {{ client.surname }}</h1>
+      {% else %}
         {% if trening.trening_type == "group" %}
           <h1>Занитие группы {{ trening.group.name }}</h1>
         {% else %}
           <h1>Индивидуальное занятие {{ client.name }} {{ client.surname }}</h1>
         {% endif %}
+      {% endif %}
     </div>
   </div>
 </div>
@@ -48,7 +53,7 @@
     <label for="timeend" style="font-size: 20px; margin-right: 8px;">Врмея окончания</label>
     <input required name="endtime" id="timeend" type="time" value="{{ trening.end|time:"H:i" }}" class="margin-bottom: 20px" required/>
     
-    {% if trening.trening_type == "personal" %}
+    {% if trening.trening_type == "personal" or tt == "massage" %}
       <br>
       <div class="form-check">
         <input class="form-check-input" type="checkbox" name="progul" value="on" id="cgroup"  {% if trening.progul %} checked {% endif %}>
@@ -57,7 +62,7 @@
         </label>
       </div>
     {% endif %}
-    <br>
+
     <br>
     <label for="trener" style="font-size: 20px">Тренер</label>
     <select required name="trener" id="trener" class="form-control" style="font-size: 20px">
@@ -70,6 +75,7 @@
     </select>
     
     <br>
+    {% if not tt == "massage" %}
     <br>
     <label for="helper" style="font-size: 20px">Помощник тренера <div style="font-size: 12px">(не обязательно)</div></label>
     <select name="helper" id="helper" class="form-control" style="font-size: 20px">
@@ -82,20 +88,136 @@
 
     </select>
     
-
+    {% endif %}
   </div>
+
+
+
+
+
+
   {% if trening.trening_type == "group" %}
   <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+    
+
+
     <br>
-    {% for cl in clients %}
-        <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="clientgroup{{ cl.pk }}" value="on" id="cgroup" {% if cl.pk in pr %}checked{% endif %}>
-        <label class="form-check-label" style="font-size: 28px;" for="cgroup">
-            {{ cl.name }} {{ cl.surname }}
-        </label>
-        </div>
-    {% endfor %}
+    <p title="
+
+Н - отсутствует
+Б - болеет
+О - отпуск/уехал
+У - увожительная причина
++ - присутствует" style="font-size: 21px">🛈</p>
+{% comment %}
+	    <p>Н - отсутствует</p>
+	    <p>Б - болеет</p>
+	    <p>П - прогул</p>
+	    <p>О - отпуск/уехал</p>
+	    <p>У - увожительная причина</p>
+	    <p>+ - присутствует</p>
+{% endcomment %}
+    <div id="clxx">
+
+      {% for cl in clients %}
+          <div class="form-check">
+          <select name="clientgroup{{ cl.pk }}" id="cgroup" class="" style="font-size: 20px">
+
+            <option {% if pr|gi:cl.pk == 0 %}selected{% endif %} value="0">Н</option>
+            <option {% if pr|gi:cl.pk == 1 %}selected{% endif %} value="1">Б</option>
+            <option {% if pr|gi:cl.pk == 2 %}selected{% endif %} value="2">О</option>
+            <option {% if pr|gi:cl.pk == 3 %}selected{% endif %} value="3">У</option>
+            <option {% if pr|gi:cl.pk == 4 %}selected{% endif %} value="4">+{{ pr.cl  }}</option>
+            
+          </select>
+
+          <label class="form-check-labell" style="font-size: 28px;" for="cgroup">
+              {{ cl.name }} {{ cl.surname }}
+          </label>
+          </div>
+      {% endfor %}
+    </div>
+    <br>
+    <button type="button" class="btn btn-secondary btn-sm" onclick="showAllClients()">Показать ещё</button>
+    <br>
+  <div id="allcl" hidden>
+    
+    <br>
+    <div class="search-container">
+      <input type="text" placeholder="Искать..." id="searchInput" onkeyup="searchClients()">
+    </div>
+    
+    <div class="">
+        {% for cl in allcl %}
+            <div class="form-check" id="cl">
+              <select name="clientgroup{{ cl.pk }}" id="cgroup" class="" style="font-size: 20px">
+
+                {% comment %} {% if cl.pk in pr %} {% endcomment %}
+
+                <option {% if pr|gi:cl.pk == 0 %}selected{% endif %} value="0">Н</option>
+                <option {% if pr|gi:cl.pk == 1 %}selected{% endif %} value="1">Б</option>
+                <option {% if pr|gi:cl.pk == 2 %}selected{% endif %} value="2">О</option>
+                <option {% if pr|gi:cl.pk == 3 %}selected{% endif %} value="3">У</option>
+                <option {% if pr|gi:cl.pk == 4 %}selected{% endif %} value="4">+</option>
+
+                {% comment %} {% else %}
+
+                <option selected value="0">Н</option>
+                <option value="1">Б</option>
+                <option value="2">О</option>
+                <option value="3">У</option>
+                <option value="4">+</option>
+                
+                {% endif %} {% endcomment %}
+
+              </select>
+              <label class="form-check-label" style="font-size: 28px;" for="cgroup">
+                  {{ cl.name }} {{ cl.surname }}
+              </label>
+            </div>
+        {% endfor %}
+    </div>
+  
+    <script>
+        function searchClients() {
+            // Get the search input value
+            var searchValue = document.getElementById("searchInput").value;
+            var clients = document.getElementsByClassName("form-check-label");
+            // Filter the clients based on the search value
+            var filteredClients = Array.prototype.filter.call(clients, function(client) {
+                return client.textContent.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1;
+            });
+            // Hide all clients
+            for (var i = 0; i < clients.length; i++) {
+                clients[i].parentElement.style.display = "none";
+            }
+            // Show the filtered clients
+            for (var i = 0; i < filteredClients.length; i++) {
+                filteredClients[i].parentElement.style.display = "block";
+            }
+        }
+
+        function showAllClients() {
+          var allcl = document.getElementById("allcl");
+          allcl.hidden = false;
+        }
+    </script>
+
+
+
   </div>
+  {% endif %}
+
+  {% if tt == "massage" %}
+  <label for="mastype" style="font-size: 20px">Тип массажа</label>
+  <select name="mastype" id="mastype" class="form-control" style="font-size: 20px">
+
+      <option disabled value> -- Выберите тип массажа -- </option>
+      {% for t in mt %}
+          <option value="{{ t.pk }}" {% if smt.pk == t.pk %}selected{% endif %}>{{ t.title }}</option>
+      {% endfor %}
+
+  </select>
   {% endif %}
 </div>
 </form>

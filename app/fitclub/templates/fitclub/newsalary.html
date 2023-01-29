@@ -3,12 +3,28 @@
     <br>
     <br>
 
+    {{user.id}}
+
+    {% if admsl %}
     <form method="post">
-        <div class="form-group">
-          <label for="groupname"><h3>Выплата</h3><h4>{{ user.first_name }} {{ user.last_name }}</h4></label>
-          <input name="col" required type="number" class="form-control form-control-lg" id="groupname" placeholder="Введите сумму">
-        </div>
-        <button type="submit" class="btn-block btn-lg btn-primary">Сохранить</button>
+      <div class="form-group">
+        <label for="groupname"><h3>Выплата</h3><h4>{{ user.first_name }} {{ user.last_name }}</h4></label>
+        {% if admsl.type == "percent" %}
+          <h4>{{admsl.value|stringformat:".2f" }}% от выручки в этом месяце</h4>
+        {% endif %}
+        <input name="col" required type="number" class="form-control form-control-lg" id="groupname" placeholder="Введите сумму" value="{% if admsl.type == "sum" %}{{ admsl.value|stringformat:".2f" }}{% else %}{{ slrsum|stringformat:".2f" }}{% endif %}">
+      </div>
+      <button type="submit" class="btn-block btn-lg btn-primary">Сохранить</button>
     </form>
+    {% else %}
+    <form method="post">
+      <div class="form-group">
+        <label for="groupname"><h3>Выплата</h3><h4>{{ user.first_name }} {{ user.last_name }}</h4></label>
+        <input name="col" required type="number"  min="1" step="0.01" class="form-control form-control-lg" id="groupname" placeholder="Введите сумму">
+      </div>
+      <button type="submit" class="btn-block btn-lg btn-primary">Сохранить</button>
+    </form>
+    {% endif %}
+
 
 {% endblock %}

@@ -44,9 +44,13 @@
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
           <a class="dropdown-item" href="{% url 'newpay' "one" user.pk %}">Индивидуальное занятие</a>
-          <a class="dropdown-item" href="{% url 'newpay' "one_month" user.pk %}">Индивидуальное абонимент</a>
+          <a class="dropdown-item" href="{% url 'newpay' "one_month" user.pk %}">Индивидуальное абонемент</a>
           <a class="dropdown-item" href="{% url 'newpay' "group" user.pk %}">Групповое занятие</a>
-          <a class="dropdown-item" href="{% url 'newpay' "group_month" user.pk %}">Групповое абонимент</a>
+          <a class="dropdown-item" href="{% url 'newpay' "group_month" user.pk %}">Групповое абонемент</a>
+          <div class="dropdown-divider"></div>
+          {% for mt in massage_types %}
+            <a class="dropdown-item" href="{% url 'newpay' mt.1 user.pk %}">Массаж - {{ mt.0.title }}</a>
+          {% endfor %}
         </div>
       </div>
     </div>
@@ -58,14 +62,34 @@
 
 <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
-    <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Группы</a>
+    <a class="nav-item nav-link active" id="nav-info-tab" data-toggle="tab" href="#nav-info" role="tab" aria-controls="nav-info" aria-selected="true">Инфо</a>
+    <a class="nav-item nav-link" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="false">Группы</a>
     <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Занятия</a>
     <a class="nav-item nav-link" id="nav-pay-tab" data-toggle="tab" href="#nav-pay" role="tab" aria-controls="nav-pay" aria-selected="false">Оплаты</a>
     <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Настройки</a>
+    <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-mas" role="tab" aria-controls="nav-mas" aria-selected="false">Массаж</a>
   </div>
 </nav>
 <div class="tab-content" id="nav-tabContent">
-  <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+  <div class="tab-pane fade show active" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab">
+    <br>
+    <h3>Оплаченые занятия</h3>
+      <p class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">Оплаченных индивидуальных занятий осталось: {{ singl_col }}</p>
+      
+
+      <p class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">Оплаченных групповых занятий осталось: {{ groups_col }}</p>
+
+    <br>
+    <h3>Абонементы</h3>
+    {% for sub in subs %}
+      <p class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;"> Абонемент на {% if sub.sport_group %}групповы занятия{% else %}индивидуальные занятия{% endif %} с {{sub.start_date|date:"d.m.Y"}} по {{ sub.end_date|date:"d.m.Y" }}. Осталось занятий: {{sub.num_sessions}} <a type="button" href="{% url 'chggroup' sub.pk %}"  class="btn btn-primary float-right">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
+<path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"></path>
+</svg>
+</a> </p>
+    {% endfor %}
+  </div>
+  <div class="tab-pane fade" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
     <br>
     
     {% for group in gruops %}
@@ -80,8 +104,8 @@
   <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
     <div class="list-group">
       <br>
-      {% for tr in trenings %}
-        <p href="{% url 'trening' tr.0.pk %}" class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ tr.0.day|date:"D d M" }}: {{ tr.0.start|time:"H:i" }} - {% if tr.0.trening_type == "group" %}<a href="{% url 'group' tr.0.group.pk %}">групповое</a> занятие{% else %}индивидуальное занятие{% endif %} <block class="float-right success">{% if tr.1 %}<button type="button" disabled class="btn btn-success">Оплачено</button>{% else %}<button type="button" disabled class="btn btn-danger">Не оплачено</button>{% endif %}</block></p>
+      {% for tr in trens %}
+        <a href="{% url 'trening' tr.0.pk %}" class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ tr.0.day|date:"D d M" }}: {{ tr.0.start|time:"H:i" }} - {% if tr.0.trening_type == "group" %}групповое занятие{% else %}индивидуальное занятие{% endif %} <block class="float-right success">{% if tr.1 %}<button type="button" disabled class="btn btn-success">Оплачено</button>{% else %}<button type="button" disabled class="btn btn-danger">Не оплачено</button>{% endif %}</block></a>
       {% endfor %}
     </div>
   </div>
@@ -98,11 +122,11 @@
         {% endif %}
 
         {% if pay.pay_type == "group" %}
-          <p class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ pay.value }}₽ - Оплата группового занятия (<a href="{% url 'group' pay.group.pk %}">{{ pay.group.name }}</a>) {{ pay.date|date:"d.m.Y" }}</p>
+          <p class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ pay.value }}₽ - Оплата группового занятия - {{ pay.date|date:"d.m.Y" }}</p>
         {% endif %}
 
         {% if pay.pay_type == "group_month" %}
-          <p class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ pay.value }}₽ - Оплата абонемента на групповые занятия (<a href="{% url 'group' pay.group.pk %}">{{ pay.group.name }}</a>) {{ pay.date|date:"d.m.Y" }}</p>
+          <p class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ pay.value }}₽ - Оплата абонемента на групповые занятия - {{ pay.date|date:"d.m.Y" }}</p>
         {% endif %}
       {% endfor %}
     </div>
@@ -121,6 +145,25 @@
     <label for="clientemail">E-mail</label>
     <input name="clientemail" type="text" class="form-control form-control-lg" id="clientemail" value="{{ user.email }}">
     <br>
+    <h4>Код для привязки Telegram: {{ tgcode }}</h4>
+  </div>
+  <div class="tab-pane fade" id="nav-mas" role="tabpanel" aria-labelledby="nav-mas-tab">
+    <br>
+    <a href="{% url 'newmas' user.pk %}" class="btn btn-info"  style="margin-left: auto; margin-right:5px; margin-bottom: 5px;" role="button">Новое занятие</a>
+
+    <br>
+    <h3>Оплаченные занятия</h3>
+    {% for msc in mas_cols %}
+      <p class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;"> {{ msc.0.title }} - {{msc.1}}</p>
+    {% endfor %}
+    <br>
+    <div class="list-group">
+      <br>
+      <br>
+      {% for tr in massages %}
+        <a href="{% url 'trening' tr.0.pk %}" class="list-group-item list-group-item-action" style="font-size: 1.3em; margin-bottom: 5px;">{{ tr.0.day|date:"D d M" }}: {{ tr.0.start|time:"H:i" }}  <block class="float-right success">{% if tr.1 %}<button type="button" disabled class="btn btn-success">Оплачено</button>{% else %}<button type="button" disabled class="btn btn-danger">Не оплачено</button>{% endif %}</block></a>
+      {% endfor %}
+    </div>
   </div>
 </div>  
 </form>

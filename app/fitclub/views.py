@@ -10,6 +10,12 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import NewUserForm
 from .models import *
 import datetime
+# import send_message bot
+from .management.commands.bot import send_message
+
+from .tasks import testshd, alert_subs
+
+
 
 
 DAYS = [
@@ -23,20 +29,27 @@ DAYS = [
     'Воскресенье'
 ]
 
+
 def ini(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
+    # if not request.user.is_authenticated:
+    #     return redirect('login')
     
     ret = "OK\n"
 
-    group1 = Group(name = "admin")
-    group1.save()
-    group2 = Group(name = "trener")
-    group2.save()
+    # group1 = Group(name = "admin")
+    # group1.save()
+    # group2 = Group(name = "trener")
+    # group2.save()
+    # group3 = Group(name = "masager")
+    # group3.save()
+
     ret += "User groups\n"
     
     
     return HttpResponse(ret)
+
+
+
 
 
 def index(request):
@@ -96,7 +109,7 @@ def admin_users(request):
     
     User = get_user_model()
     users = User.objects.filter(
-    groups__name__in=['trener', 'admin'])
+    groups__name__in=['trener', 'admin', 'masager'])
     return render(request=request, template_name="fitclub/users.html", context={'users': users})
 
 @csrf_exempt
@@ -106,25 +119,33 @@ def user_info(request, id):
     User = get_user_model()
     user = User.objects.get(pk=id)
 
+    if len(user.groups.all()) > 0:
+        rl = user.groups.all()[0].name
+    else:
+        rl = "none"
+
     if request.method == "POST":
         data = request.POST
-        
-        role = data['role']
-        group = Group.objects.get(name=role)
-        user.groups.clear()
-        user.groups.add(group)
 
         user.first_name = data['clientname']
         user.last_name = data['clientsurname']
         user.email = data['clientemail']
 
+        if rl == "admin":
+            selary_type = data['selarytype']
+            selary_valuse = data['selary']
+
+            if selary_type == "none":
+                if AdminSalary.objects.filter(user=user).exists():
+                    AdminSalary.objects.filter(user=user).delete()
+            else:
+                if AdminSalary.objects.filter(user=user).exists():
+                    AdminSalary.objects.filter(user=user).update(type=selary_type, value=selary_valuse)
+                else:
+                    AdminSalary.objects.create(user=user, type=selary_type, value=selary_valuse)
+
         user.save()
 
-
-    if len(user.groups.all()) > 0:
-        rl = user.groups.all()[0].name
-    else:
-        rl = "none"    
 
     groups = SportGroup.objects.filter(trener=user)
 
@@ -162,8 +183,15 @@ def user_info(request, id):
             else:
                 sums.append([so, "Персональная тренировка", t.day])
                 sm += so
+    
+    smv = None
+    if rl == "admin":
+        if AdminSalary.objects.filter(user=user).exists():
+            smv = AdminSalary.objects.get(user=user)
 
-    return render(request=request, template_name="fitclub/user.html", context={'user': user, 'rl': rl, 'groups': groups, 'trenings': trenings, 'sums': sums, 'ym': f"{year}-{month}", 'sm': sm})
+    
+
+    return render(request=request, template_name="fitclub/user.html", context={'user': user, 'smv': smv, 'rl': rl, 'groups': groups, 'trenings': trenings, 'sums': sums, 'ym': f"{year}-{month}", 'sm': sm})
 
 
 @csrf_exempt
@@ -260,6 +288,8 @@ def group_info(request, id):
     if not request.user.is_authenticated:
         return redirect('login')
     User = get_user_model()
+    group = SportGroup.objects.get(pk=id)
+    clients = Client.objects.filter(groups=group.pk)
     if request.method == "POST":
         data = request.POST
         group = SportGroup.objects.get(pk=id)
@@ -286,13 +316,18 @@ def group_info(request, id):
         if "edittime" in data:
             return redirect('edittime', time_id=int(data['edittime']))
 
+        if "issend" in data:
+            msgtxt = data['messagetxt']
+            for cl in clients:
+                if cl.tg:
+                    send_message(cl.tg, msgtxt)
+
         group.save()
 
 
-    group = SportGroup.objects.get(pk=id)
     tereners = User.objects.filter(groups__name='trener')
 
-    clients = Client.objects.filter(groups=group.pk)
+
 
     times = GroupTime.objects.filter(group=group.pk).order_by('day')
 
@@ -337,30 +372,48 @@ def client_info(request, id):
         client.save()
 
     trenings = Trening.objects.filter(clients__id=client.pk).order_by('day', '-start')
-    payments = Peyment.objects.filter(client__pk=id)
+    payments = Peyment.objects.filter(client__pk=id).order_by('-date')
     
-    plts = payments.all()
-    
-    trens = []
-    for tren in trenings:
-        print(type(plts))
-        isp = False
-        if tren.trening_type == "personal":
-            if plts.filter(pay_type="one_month", date__month=tren.day.month):
-                isp = True
-            elif plts.filter(pay_type="one", date=tren.day):
-                plts = plts.exclude(pk=plts.filter(pay_type="one", date=tren.day).first().pk)
-                isp = True
-        if tren.trening_type == "group":
-            if plts.filter(group=tren.group, pay_type="group_month", date__month=tren.day.month):
-                isp = True
-            elif plts.filter(group=tren.group, pay_type="group", date=tren.day):
-                plts = plts.exclude(pk=plts.filter(pay_type="group", date=tren.day).first().pk)
-                isp = True
-        
-        trens.append([tren, isp])
-    
-    return render(request=request, template_name="fitclub/client.html", context={'user': client, 'gruops': groups, 'trenings': trens, 'payments': payments})
+
+    # get all Subscriptions where client is client and today is between start_date and end_date or num_sessions > 0
+    subs = Subscription.objects.filter(client=client, start_date__lte=datetime.date.today(), end_date__gte=datetime.date.today()) | Subscription.objects.filter(client=client, num_sessions__gt=0)
+
+    # get count of SingleTren where client is client and trening is null and pay pay_type is one
+    singl_col  = SingleTren.objects.filter(client=client, trening=None, pay__pay_type="one").count()
+    groups_col = SingleTren.objects.filter(client=client, trening=None, pay__pay_type="group").count()
+
+
+    # get all SingleTren where client is client and trening is not null
+    single_trenings = SingleTren.objects.filter(client=client, trening__isnull=False)
+    # get all Trening from single_trenings
+    trens = [(tren.trening, True if tren.pay else False) for tren in single_trenings]
+
+    # get all Subscriptions where client is client
+    subscrs = Subscription.objects.filter(client=client)
+    # get all Trening from subscrs
+    trens += [(tren, True) for subscr in subscrs for tren in subscr.trenings.all()]
+    trens.sort(key=lambda x: x[0].day, reverse=True)
+
+
+    massages = Massage.objects.filter(client=client, trening__isnull=False).order_by('-trening__day', '-trening__start')
+    mass = []
+    for mas in massages:
+        mass.append((mas.trening, True if mas.pay else False))
+
+
+    massage_types = MassageTypes.objects.all()
+
+    mas_pay_counts = []
+
+    for mt in massage_types:
+        mas_pay_counts.append((mt, Massage.objects.filter(client=client, trening__isnull=True, pay__isnull=False, pay__pay_type=f"massage_{mt.pk}").count()))
+
+    mts = []
+    for mt in massage_types:
+        mts.append((mt, f"massage-{mt.pk}"))
+
+    tgcode = client.pk + 4564
+    return render(request=request, template_name="fitclub/client.html", context={'tgcode': tgcode, 'massage_types': mts, 'mas_cols': mas_pay_counts, 'massages': mass, 'trens': trens, 'singl_col': singl_col ,'groups_col': groups_col,'subs': subs, 'user': client, 'gruops': groups, 'payments': payments})
 
 @csrf_exempt
 def add_new_time(request, group_id):
@@ -435,6 +488,7 @@ def new_trening(request, group_id):
     User = get_user_model()
     group = SportGroup.objects.get(pk=group_id)
     clients = Client.objects.filter(groups=group.pk)
+    allcl = Client.objects.all()
     if request.method == "POST":
         data = request.POST
 
@@ -449,22 +503,65 @@ def new_trening(request, group_id):
         else:
             helper = None
         
+        # col = 0
+        # parcts = []
+        # for cl in clients:
+        #     if f'clientgroup{cl.pk}' in data:
+        #         col += 1
+        #         parcts.append(cl)
+
+
         col = 0
         parcts = []
-        for cl in clients:
+        std_dt = {}
+        for cl in allcl:
             if f'clientgroup{cl.pk}' in data:
-                col += 1
-                parcts.append(cl)
+                if cl in clients:
+                    if int(data[f'clientgroup{cl.pk}']) == 4:
+                        col += 1
+                    if int(data[f'clientgroup{cl.pk}']) in [0, 4]:
+                        parcts.append(cl)
+                    std_dt[cl.pk] = int(data[f'clientgroup{cl.pk}'])
+                elif int(data[f'clientgroup{cl.pk}']) == 4:
+                    col += 1
+                    parcts.append(cl)
+                    std_dt[cl.pk] = int(data[f'clientgroup{cl.pk}'])
+
         
         progul = True if col == 0 else False
         
-        trening = Trening(start=ts, end=te, day=dt, group=group, trening_type="group", col=col, is_was=True, progul=progul, trener=trener, helper=helper)
+        trening = Trening(start=ts, end=te, day=dt, group=group, trening_type="group", col=col, is_was=True, progul=progul, trener=trener, helper=helper, students_data=std_dt)
         trening.save()
         trening.clients.add(*parcts)
         trening.save()
+        
+        for client in trening.clients.all():
+
+            sub = Subscription.objects.filter(client=client, 
+            start_date__lte=dt, 
+            end_date__gte=dt, num_sessions__gt=0, 
+            tren_type="group").order_by('start_date').first()
+
+            if sub:
+                sub.trenings.add(trening)
+                sub.num_sessions -= 1
+                sub.save()
+            else:
+                sgt = SingleTren.objects.filter(client=client, 
+                trening__isnull=True, 
+                pay__pay_type='group').order_by('pay__date').first()
+
+                if sgt:
+                    sgt.trening = trening
+                    sgt.save()
+                else:
+                    nsg = SingleTren(client=client, trening=trening, pay=None)
+                    nsg.save()
+
+        alert_subs.apply_async(args=(trening.pk, True), countdown=24*60*60)
 
         return redirect('group', id=group_id)
-
+    
     treniers = User.objects.filter(groups__name='trener')
 
     rl = ""
@@ -473,7 +570,11 @@ def new_trening(request, group_id):
     else:
         rl = "none"
 
-    return render(request=request, template_name="fitclub/new_trening.html", context={'group': group, 'user': request.user, 'treniers': treniers, 'rl': rl, 'clients': clients})
+    # get all clients who not in group
+    for cl in clients:
+        allcl = allcl.exclude(pk=cl.pk)
+        
+    return render(request=request, template_name="fitclub/new_trening.html", context={'allcl': allcl, 'group': group, 'user': request.user, 'treniers': treniers, 'rl': rl, 'clients': clients})
 
 
 def admin_trenings(request):
@@ -488,8 +589,48 @@ def info_trenings(request, id):
     if not request.user.is_authenticated:
         return redirect('login')
     trening = Trening.objects.get(pk=id)
+
+    if trening.trening_type.split('_')[0] == "massage":
+        client = Client.objects.get(pk=trening.clients.all()[0].pk)
+
+        if request.method == "POST":
+            data = request.POST
+
+            ts = datetime.time(*(map(int, data['starttime'].split(':'))))
+            te = datetime.time(*(map(int, data['endtime'].split(':'))))
+
+            dt = datetime.date(*(map(int, data['date'].split('-'))))
+
+            trener = User.objects.get(pk=int(data['trener']))
+
+            progul = False
+            if "progul" in data:
+                progul = True
+
+            col = 0 if progul else 1
+
+            mst_id = data['mastype']
+            
+            trening.start = ts
+            trening.end = te
+            trening.day = dt
+            trening.trening_type = f"massage_{mst_id}"
+            trening.col = col
+            trening.is_was = True
+            trening.progul = progul
+            trening.trener = trener
+            trening.save()
+
+        treniers = User.objects.filter(groups__name='masager')
+        tt = "massage"
+        smt = MassageTypes.objects.get(pk=int(trening.trening_type.split('_')[1]))
+        mt = MassageTypes.objects.all()
+        return render(request=request, template_name="fitclub/edit_trening.html", context={'mt': mt,'smt': smt, 'tt': tt, 'trening': trening, 'treniers': treniers, 'client': client})
+
+
     if trening.trening_type == "group":
         clients = Client.objects.filter(groups=trening.group.pk)
+        allcl = Client.objects.all()
 
         if request.method == "POST":
             data = request.POST
@@ -510,11 +651,24 @@ def info_trenings(request, id):
             
             col = 0
             parcts = []
-
-            for cl in clients:
+            std_dt = {}
+            for cl in allcl:
                 if f'clientgroup{cl.pk}' in data:
-                    col += 1
-                    parcts.append(cl)
+                    if cl in clients:
+                        if int(data[f'clientgroup{cl.pk}']) == 4:
+                            col += 1
+                        if int(data[f'clientgroup{cl.pk}']) in [0, 4]:
+                            parcts.append(cl)
+                        std_dt[cl.pk] = int(data[f'clientgroup{cl.pk}'])
+                    elif int(data[f'clientgroup{cl.pk}']) == 4:
+                        col += 1
+                        parcts.append(cl)
+                        std_dt[cl.pk] = int(data[f'clientgroup{cl.pk}'])
+
+            # for cl in clients:
+            #     if f'clientgroup{cl.pk}' in data:
+            #         col += 1
+            #         parcts.append(cl)
             
             progul = True if col == 0 else False
             
@@ -527,18 +681,68 @@ def info_trenings(request, id):
             trening.progul = progul
             trening.trener = trener
             trening.helper = helper
+            trening.students_data = std_dt
             trening.clients.clear()
             if col > 0:
                 trening.clients.add(*parcts)
             trening.save()
-        
+
+            
+            sgtrs = SingleTren.objects.filter(trening=trening)
+            for tr in sgtrs:
+                if not tr.client in trening.clients.all():
+                    if tr.pay is None:
+                        tr.delete()
+                    else:
+                        tr.trening = None
+                        tr.save()
+
+
+            # get all subs where trening in subs.trenings
+            subs = Subscription.objects.filter(trenings=trening)
+            for sub in subs:
+                if not sub.client in trening.clients.all():
+                    sub.trenings.remove(trening)
+                    sub.num_sessions += 1
+                    sub.save()
+            
+            # get all subs where client in trening.clients
+            clsubs = Subscription.objects.filter(client__in=trening.clients.all())
+            for clsub in clsubs:
+                if not clsub.trenings.filter(pk=trening.pk).first():
+                    clsub.trenings.add(trening)
+                    clsub.num_sessions -= 1
+                    clsub.save()
+            
+            for client in trening.clients.all():
+                if not SingleTren.objects.filter(trening=trening).first():
+                    sgt = SingleTren.objects.filter(client=client, trening__isnull=True, pay__pay_type='group').order_by('pay__date').first()
+
+                    if sgt:
+                        sgt.trening = trening
+                        sgt.save()
+                    else:
+                        nsg = SingleTren(client=client, trening=trening, pay=None)
+                        nsg.save()
+            
 
         treniers = User.objects.filter(groups__name='trener')
-        pr = []
-        for cl in trening.clients.all():
-            pr.append(cl.pk)
 
-        return render(request=request, template_name="fitclub/edit_trening.html", context={'trening': trening, 'treniers': treniers, 'clients': clients, 'pr': pr})
+
+        treniers = User.objects.filter(groups__name='trener')
+
+        rl = ""
+        if len(request.user.groups.all()) > 0:
+            rl = request.user.groups.all()[0].name
+        else:
+            rl = "none"
+
+        # get all clients who not in group
+        for cl in clients:
+            allcl = allcl.exclude(pk=cl.pk)
+        
+        pr = trening.students_data
+        return render(request=request, template_name="fitclub/edit_trening.html", context={'trening': trening, 'treniers': treniers, 'clients': clients, 'pr': pr, 'allcl': allcl})
     else:
         client = Client.objects.get(pk=trening.clients.all()[0].pk)
 
@@ -559,6 +763,16 @@ def info_trenings(request, id):
             else:
                 helper = None
             
+
+
+            
+            if int(data[f'clientgroup{cl.pk}']) == 4:
+                col += 1
+            if int(data[f'clientgroup{cl.pk}']) in [0, 4]:
+                parcts.append(cl)
+            std_dt[cl.pk] = int(data[f'clientgroup{cl.pk}'])
+
+
             progul = False
             if "progul" in data:
                 progul = True
@@ -574,8 +788,38 @@ def info_trenings(request, id):
             trening.progul = progul
             trening.trener = trener
             trening.helper = helper
+            trening.students_data = std_dt
             trening.save()
-        
+
+
+
+            sgtr = SingleTren.objects.filter(trening=trening).first()
+            if not sgtr:
+                subs = Subscription.objects.filter(client=client, trenings=trening).first()
+                # check if dt between sub.start and sub.end
+                if not (subs.start_date <= dt and dt <= subs.end_date):
+                    sub = Subscription.objects.filter(client=client, start_date__lte=dt, end_date__gte=dt, num_sessions__gt=0, tren_type="single").order_by('start_date').first()
+
+                    if sub:
+                        # add to sub trenings trening and num sessions minus 1
+                        sub.trenings.add(trening)
+                        sub.num_sessions -= 1
+                        sub.save()
+            
+                    else:
+                        sgt = SingleTren.objects.filter(client=client, trening__isnull=True, pay__pay_type='one').order_by('pay__date').first()
+
+                        if sgt:
+                            sgt.trening = trening
+                            sgt.save()
+                        else:
+                            nsg = SingleTren(client=client, trening=trening, pay=None)
+                            nsg.save()
+                    
+                    subs.trenings.remove(trening)
+                    subs.num_sessions += 1
+                    subs.save()
+                
 
         treniers = User.objects.filter(groups__name='trener')
 
@@ -635,6 +879,29 @@ def new_per(request, id):
         trening.clients.add(client)
         trening.save()
 
+
+        # get Subscription where client is client and start_date <= dt and end_date >= dt and num_sessions > 0 and sport_group is None order by start_date
+        sub = Subscription.objects.filter(client=client, start_date__lte=dt, end_date__gte=dt, num_sessions__gt=0, tren_type="single").order_by('start_date').first()
+
+        if sub:
+            # add to sub trenings trening and num sessions minus 1
+            sub.trenings.add(trening)
+            sub.num_sessions -= 1
+            sub.save()
+   
+        else:
+            sgt = SingleTren.objects.filter(client=client, trening__isnull=True, pay__pay_type='one').order_by('pay__date').first()
+
+            if sgt:
+                sgt.trening = trening
+                sgt.save()
+            else:
+                nsg = SingleTren(client=client, trening=trening, pay=None)
+                nsg.save()
+        
+
+        alert_subs.apply_async(args=(trening.pk, True), countdown=20)
+
         return redirect('client', id=id)
 
     treniers = User.objects.filter(groups__name='trener')
@@ -656,82 +923,220 @@ def new_pay(request, type, client_id):
     if request.method == "POST":
         data = request.POST
 
-        if type == "one":
-            price = Param.objects.get(key="prise_one")
-            way = "card"
-            if data['role'] == "money":
-                way = "cash"
-            date = datetime.date(*(map(int, data['date'].split('-'))))
+        if type.split('-')[0] == "massage":
+        
+            col = int(data["col"])
+            price = data["price"]
+            mt = MassageTypes.objects.get(pk=int(type.split('-')[1]))
+            for _ in range(col):
+                way = "card"
+                if data['role'] == "money":
+                    way = "cash"
+                if data['role'] == "site":
+                    way = "site"
 
-            pay = Peyment(client=client, way=way, pay_type="one", date=date, value=price.value)
-            pay.save()
+                date = datetime.date(*(map(int, data['date'].split('-'))))
+
+                pay = Peyment(client=client, way=way, pay_type=f"massage_{mt.pk}", date=date, value=price)
+                pay.save()
+                
+
+                notpayd = Massage.objects.filter(client=client, pay__isnull=True, trening__trening_type=f'massage_{mt.pk}').order_by('trening__day').first()
+                if notpayd:
+                    notpayd.pay = pay
+                    notpayd.save()
+                else:
+                    sgtren = Massage(client=client, pay=pay, trening=None)
+                    sgtren.save()
+
             return redirect('client', id=client_id)
         
+        if type == "one":
+        
+            col = int(data["col"])
+            for _ in range(col):
+                price = data["price"]
+                way = "card"
+                if data['role'] == "money":
+                    way = "cash"
+                if data['role'] == "site":
+                    way = "site"
+
+                date = datetime.date(*(map(int, data['date'].split('-'))))
+
+                pay = Peyment(client=client, way=way, pay_type="one", date=date, value=price)
+                pay.save()
+                
+                
+                notpayd = SingleTren.objects.filter(client=client, pay__isnull=True, trening__trening_type='personal').order_by('trening__day').first()
+                if notpayd:
+                    notpayd.pay = pay
+                    notpayd.save()
+                else:
+                    sgtren = SingleTren(client=client, pay=pay, trening=None)
+                    sgtren.save()
+                    
+            return redirect('client', id=client_id)
+
         if type == "one_month":
-            price = Param.objects.get(key="price_one_month")
+            price = data["price"]
             way = "card"
             if data['role'] == "money":
                 way = "cash"
-            date = datetime.date(*(map(int, data['date'].split('-'))), 1)
+            if data['role'] == "site":
+                    way = "site"
 
-            pay = Peyment(client=client, way=way, pay_type="one_month", date=date, value=price.value)
+            date = datetime.date(*(map(int, data['date'].split('-'))))
+
+            pay = Peyment(client=client, way=way, pay_type="one_month", date=date, value=data['price'])
             pay.save()
+            
+            
+            startdate = datetime.date(*(map(int, data['startdate'].split('-'))))
+            enddate = datetime.date(*(map(int, data['enddate'].split('-'))))
+            sub = Subscription(start_date=startdate, end_date=enddate, num_sessions=int(data['col']), client=client, pay=pay, sport_group=None, tren_type="single")
+            sub.save()
+            
+            # get all SingeTren where client is client and pay is null and trening is not null and trening day >= startdate and trening day <= enddate and trening trening_type is personal and order by trening day
+            sgtrs = SingleTren.objects.filter(client=client, pay__isnull=True, trening__isnull=False, trening__day__gte=startdate, trening__day__lte=enddate, trening__trening_type='personal').order_by('trening__day')
+
+            for tr in sgtrs:
+                if sub.num_sessions <= 0:
+                    break
+                
+                # add sub trenings tr trening and num sessions minus 1
+                sub.trenings.add(tr.trening)
+                sub.num_sessions -= 1
+                
+                tr.client = None
+                tr.trening = None
+                # delite tr from database
+                tr.delete()
+            
+            sub.save()
+
             return redirect('client', id=client_id)
         
         if type == "group":
-            price = Param.objects.get(key="price_group")
-            way = "card"
-            if data['role'] == "money":
-                way = "cash"
-            date = datetime.date(*(map(int, data['date'].split('-'))))
-            group = SportGroup.objects.get(pk=int(data['group']))
-            pay = Peyment(client=client, way=way, pay_type="group", group=group, date=date, value=price.value)
-            pay.save()
+            col = int(data["col"])
+            for _ in range(col):
+                price = data["price"]
+                way = "card"
+                if data['role'] == "money":
+                    way = "cash"
+                if data['role'] == "site":
+                    way = "site"
+
+                date = datetime.date(*(map(int, data['date'].split('-'))))
+                pay = Peyment(client=client, way=way, pay_type="group", group=None, date=date, value=price)
+                pay.save()
+                
+                notpayd = SingleTren.objects.filter(client=client, pay__isnull=True, trening__trening_type='group').order_by('trening__day').first()
+                if notpayd:
+                    notpayd.pay = pay
+                    notpayd.save()
+                else:
+                    sgtren = SingleTren(client=client, pay=pay, trening=None)
+                    sgtren.save()
+                
             return redirect('client', id=client_id)
         
         if type == "group_month":
-            price = Param.objects.get(key="price_group_month")
             way = "card"
             if data['role'] == "money":
                 way = "cash"
-            date = datetime.date(*(map(int, data['date'].split('-'))), 1)
-            group = SportGroup.objects.get(pk=int(data['group']))
-            pay = Peyment(client=client, way=way, pay_type="group_month", group=group, date=date, value=price.value)
+            if data['role'] == "site":
+                way = "site"
+            
+            date = datetime.date(*(map(int, data['date'].split('-'))))
+            pay = Peyment(client=client, way=way, pay_type="group_month", group=None, date=date, value=data['price'])
             pay.save()
+            
+            
+            startdate = datetime.date(*(map(int, data['startdate'].split('-'))))
+            enddate = datetime.date(*(map(int, data['enddate'].split('-'))))
+            sub = Subscription(start_date=startdate, end_date=enddate, num_sessions=int(data['col']), client=client, pay=pay, sport_group=None, tren_type="group")
+            sub.save()
+            
+            # get all SingeTren where client is client and pay is null and trening is not null and trening day >= startdate and trening day <= enddate and trening trening_type is group and trening group is group and order by trening day            
+            sgtrs = SingleTren.objects.filter(client=client, pay__isnull=True, trening__isnull=False, trening__day__gte=startdate, trening__day__lte=enddate, trening__trening_type='group').order_by('trening__day')
+
+            for tr in sgtrs:
+                if sub.num_sessions <= 0:
+                    break
+                
+                # add sub trenings tr trening and num sessions minus 1
+                sub.trenings.add(tr.trening)
+                sub.num_sessions -= 1
+                
+                tr.client = None
+                tr.trening = None
+                # delite tr from database
+                tr.delete()
+            
+            sub.save()
+            
             return redirect('client', id=client_id)
 
-
+    percent = Param.objects.get(key="site_pay_percent")
     if type == "one":
         price = Param.objects.get(key="prise_one")
 
-        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price})
+        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price, 'percent': percent.value})
     
     if type == "one_month":
         price = Param.objects.get(key="price_one_month")
 
-        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price})
+        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price, 'percent': percent.value})
     
     if type == "group":
         price = Param.objects.get(key="price_group")
 
-        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price, 'groups': client.groups.all()})
+        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price, 'groups': client.groups.all(), 'percent': percent.value})
     
     if type == "group_month":
         price = Param.objects.get(key="price_group_month")
 
-        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price, 'groups': client.groups.all()})
+        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price, 'groups': client.groups.all(), 'percent': percent.value})
+
+    if type.split('-')[0] == "massage":
+        
+        massage_type = MassageTypes.objects.get(pk=int(type.split('-')[1]))
+        price = massage_type.prise
+
+        title = "Массаж - " + massage_type.title
+
+        return render(request=request, template_name="fitclub/new_pay.html", context={'title': title, 'mt': massage_type, 'client': client, 'type': 'massage', 'price': price, 'groups': client.groups.all(), 'percent': percent.value})
 
 
-def selary(request):
+def allselary(request, type="all"):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    return redirect('selary', type="all")
+
+
+def selary(request, type):
     if not request.user.is_authenticated:
         return redirect('login')
     User = get_user_model()
+
+    rls = []
+    if type == "all":
+        rls = ['trener', 'admin', 'masager']
+    else:
+        rls = [type]
+
+
     users = User.objects.filter(
-    groups__name__in=['trener'])
+    groups__name__in=rls)
     
     year = datetime.date.today().year
     month = datetime.date.today().month
     
+
+
+
     usrs = []
     for user in users:
         selrs = Salary.objects.filter(user=user, date__year=str(year), date__month=str(month))
@@ -787,9 +1192,19 @@ def selary(request):
                 else:
                     sma += so
 
-        usrs.append([user, sm, gv, sma - allgv])
+        
+        if len(user.groups.all()) > 0:
+            rl = user.groups.all()[0].name
+        else:
+            rl = "none" 
+        
+        if rl == "admin":
+            usrs.append([user, gv, gv, 0])
+        else:
+            usrs.append([user, sm, gv, sma - allgv])
     
-    return render(request=request, template_name="fitclub/selary.html", context={'users': usrs, 'ym': f"{year}-{month}"})
+    mnth = month if len(str(month)) == 2 else "0" + str(month)
+    return render(request=request, template_name="fitclub/selary.html", context={'users': usrs, 'ym': f"{year}-{mnth}", "type": type, "y": year, "m": month})
 
 
 @csrf_exempt
@@ -797,28 +1212,79 @@ def new_selary(request, id):
     if not request.user.is_authenticated:
         return redirect('login')
     User = get_user_model()
-    user = User.objects.get(pk=id)
+    userr = User.objects.get(pk=id)
     
     if request.method == "POST":
         data = request.POST
-        col = int(data['col'])
+        col = data['col']
         
-        selr = Salary(user=user, date=datetime.date.today(), give=col, accure=-1)
+        selr = Salary(user=userr, date=datetime.date.today(), give=col, accure=-1)
         selr.save()  
         return redirect('selary')   
 
-    return render(request=request, template_name="fitclub/newsalary.html", context={'user': user})
+    slrsum = None
+    admsl = AdminSalary.objects.filter(user=userr).first()
+    if admsl and admsl.type == "percent":
+        year = datetime.date.today().year
+        month = datetime.date.today().month
+        day = datetime.date.today().day
+        week = datetime.date.today().isocalendar().week
+        
+        ins = 0
+        pays = Peyment.objects.filter(date__year=str(year), date__month=str(month))
+        for p in pays:
+            ins += p.value
+        
+        User = get_user_model()
+        users = User.objects.filter(
+        groups__name__in=['trener', 'admin', 'masager'])
+        zp = 0
+        for user in users:
+            selrs = Salary.objects.filter(user=user, date__year=str(year), date__month=str(month))
+            for sl in selrs:
+                zp += sl.give
+        
+        spnd = 0
+        spendings = Spending.objects.filter(date__year=str(year), date__month=str(month)).order_by('-date')
+        for s in spendings:
+            spnd += s.value
+        
+        
+        incomes = Income.objects.filter(date__year=str(year), date__month=str(month)).order_by('-date')
+        for inc in incomes:
+            ins += inc.value
+        
+        prib = ins - (zp+spnd)
+        
+        slrsum = prib * admsl.value / 100
+
+    return render(request=request, template_name="fitclub/newsalary.html", context={'user': userr, 'admsl': admsl, 'slrsum': slrsum})
 
 
-def prselary(request, month, year):
+def allprselary(request, month, year):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    return redirect('prselary', type="all", month=month, year=year)
+
+
+
+def prselary(request, type, month, year):
     if not request.user.is_authenticated:
         return redirect('login')
     User = get_user_model()
+
+    rls = []
+    if type == "all":
+        rls = ['trener', 'admin', 'masager']
+    else:
+        rls = [type]
+
     users = User.objects.filter(
-    groups__name__in=['trener'])
+    groups__name__in=rls)
     
     if year == datetime.date.today().year and month == datetime.date.today().month:
-        return redirect('selary')
+        return redirect('selary', type=type)
     
     usrs = []
     for user in users:
@@ -852,9 +1318,18 @@ def prselary(request, month, year):
                 else:
                     sm += so
 
-        usrs.append([user, sm, gv])
+        if len(user.groups.all()) > 0:
+            rl = user.groups.all()[0].name
+        else:
+            rl = "none" 
+        
+        if rl == "admin":
+            usrs.append([user, gv, gv])
+        else:
+            usrs.append([user, sm, gv])
     
-    return render(request=request, template_name="fitclub/selary.html", context={'pr': True, 'users': usrs, 'ym': f"{year}-{month}"})
+    mnth = month if len(str(month)) == 2 else "0" + str(month)
+    return render(request=request, template_name="fitclub/selary.html", context={'pr': True, 'users': usrs, 'ym': f"{year}-{mnth}", "type": type, "y": year, "m": month})
 
 
 def dohod(request):
@@ -872,7 +1347,7 @@ def dohod(request):
     
     User = get_user_model()
     users = User.objects.filter(
-    groups__name__in=['trener'])
+    groups__name__in=['trener', 'admin', 'masager'])
     zp = 0
     for user in users:
         selrs = Salary.objects.filter(user=user, date__year=str(year), date__month=str(month))
@@ -904,7 +1379,7 @@ def prdohod(request, type, date):
         
         User = get_user_model()
         users = User.objects.filter(
-        groups__name__in=['trener'])
+        groups__name__in=['trener', 'admin', 'masager'])
         zp = 0
         for user in users:
             selrs = Salary.objects.filter(user=user, date=dt)
@@ -933,7 +1408,7 @@ def prdohod(request, type, date):
         
         User = get_user_model()
         users = User.objects.filter(
-        groups__name__in=['trener'])
+        groups__name__in=['trener', 'admin', 'masager'])
         zp = 0
         for user in users:
             selrs = Salary.objects.filter(user=user, date__range=[dts, dte])
@@ -962,7 +1437,7 @@ def prdohod(request, type, date):
         
         User = get_user_model()
         users = User.objects.filter(
-        groups__name__in=['trener'])
+        groups__name__in=['trener', 'admin', 'masager'])
         zp = 0
         for user in users:
             selrs = Salary.objects.filter(user=user, date__year=str(year), date__month=str(month))
@@ -979,7 +1454,6 @@ def prdohod(request, type, date):
             ins += inc.value
             
         return render(request=request, template_name="fitclub/prdohod.html", context={'incomes': incomes, 'type': type, 'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': date})
-
 
 
 @csrf_exempt
@@ -1051,7 +1525,7 @@ def edit_income(request, id):
         dt = datetime.date(*(map(int, data['date'].split('-'))))
         
         income.key=data['name']
-        income.value=int(data['col'])
+        income.value=data['col']
         income.date=dt
         income.save()
         
@@ -1078,3 +1552,153 @@ def new_client(request):
         return redirect('clients')
     
     return render(request=request, template_name="fitclub/new_client.html", context={})
+
+
+@csrf_exempt
+def new_mas(request, id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    User = get_user_model()
+    client = Client.objects.get(pk=id)
+    
+    if request.method == "POST":
+        data = request.POST
+        mt = MassageTypes.objects.get(pk=data['mastype'])
+        ts = datetime.time(*(map(int, data['starttime'].split(':'))))
+        te = datetime.time(*(map(int, data['endtime'].split(':'))))
+
+        dt = datetime.date(*(map(int, data['date'].split('-'))))
+
+        trener = User.objects.get(pk=int(data['trener']))
+        helper = None
+        
+        progul = False
+        if "progul" in data:
+            progul =  True
+
+        col = 0 if progul else 1
+        
+        trening = Trening(start=ts, end=te, day=dt, group=None, trening_type=f"massage_{mt.pk}", col=col, is_was=True, progul=progul, trener=trener, helper=helper)
+        trening.save()
+        trening.clients.add(client)
+        trening.save()
+
+        sgt = Massage.objects.filter(client=client, trening__isnull=True, pay__pay_type=f'massage_{mt.pk}').order_by('pay__date').first()
+
+        if sgt:
+            sgt.trening = trening
+            sgt.save()
+        else:
+            nsg = Massage(client=client, trening=trening, pay=None)
+            nsg.save()
+                
+        return redirect('client', id=id)
+
+    treniers = User.objects.filter(groups__name='masager')
+
+    rl = ""
+    if len(request.user.groups.all()) > 0:
+        rl = request.user.groups.all()[0].name
+    else:
+        rl = "none"
+
+    massage_types = MassageTypes.objects.all()
+
+    return render(request=request, template_name="fitclub/new_per.html", context={'mt': massage_types, 'ismas': True, 'client': client, 'user': request.user, 'treniers': treniers, 'rl': rl})
+
+
+@csrf_exempt
+def chg_group(request, id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    sub = Subscription.objects.get(pk=id)
+    client = sub.client
+    subtype = sub.tren_type
+    
+    if request.method == "POST":
+        data = request.POST
+        sub.start_date = datetime.date(*(map(int, data['startdate'].split('-'))))
+        sub.end_date = datetime.date(*(map(int, data['enddate'].split('-'))))
+        sub.num_sessions = int(data['col'])
+        sub.save()
+
+        return redirect('client', id=client.pk)
+
+    return render(request=request, template_name="fitclub/chg_group.html", context={'sub': sub, 'client': client, 'type': subtype})
+
+
+@csrf_exempt
+def new_user(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    if request.method == "POST":
+        data = request.POST
+        User = get_user_model()
+        user = User.objects.create_user(data['login'], data['email'], data['password'])
+        user.save()
+        user.groups.add(Group.objects.get(name=data['role']))
+        user.first_name = data['name']
+        user.last_name = data['surname']
+        user.save()
+        return redirect('users')
+    
+    return render(request=request, template_name="fitclub/new_user.html", context={})
+
+
+@csrf_exempt
+def params(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    if request.method == "POST":
+        data = request.POST
+        prms = Param.objects.all()
+        for prm in prms:
+            prm.value = data[f'param_{prm.pk}']
+            prm.save()
+        return redirect('params')
+
+
+    params = Param.objects.all()
+    return render(request=request, template_name="fitclub/params.html", context={'prms': params})
+
+def massagetypes(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    types = MassageTypes.objects.all()
+    return render(request=request, template_name="fitclub/massagetypes.html", context={'types': types})
+
+
+@csrf_exempt
+def mastpnew(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    if request.method == "POST":
+        data = request.POST
+        tp = MassageTypes(title=data['title'], prise=data['prise'], trener_sum=data['trener_sum'])
+        tp.save()
+        return redirect('massagetypes')
+
+    return render(request=request, template_name="fitclub/mastpnew.html", context={})
+
+
+@csrf_exempt
+def mastpedit(request, id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    if request.method == "POST":
+        data = request.POST
+        tp = MassageTypes.objects.get(pk=id)
+        tp.title = data['title']
+        tp.prise = data['prise']
+        tp.trener_sum = data['trener_sum']
+        tp.save()
+        return redirect('massagetypes')
+    
+    tp = MassageTypes.objects.get(pk=id)
+    return render(request=request, template_name="fitclub/mastpedit.html", context={'tp': tp})

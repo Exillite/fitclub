@@ -1,0 +1,54 @@
+{% extends 'fitclub/base.html' %}
+{% block content %}
+
+<style>
+    input[type='radio'] { 
+        transform: scale(1.5); 
+        margin-top: 15px;
+    }
+</style>
+
+
+    <br>
+    <br>
+
+    <form method="post">
+        
+        {% if type == "group" %}
+            <h3>Абонемент на груповые занятия</h3>
+            <h4>{{ client.name }} {{ client.surname }}</h4>
+            <br>
+            <label for="clientname" style="font-size: 20px">Дата начала</label>
+            <input required name="startdate" class="form-control form-control-lg" type="date" id="date" onchange="setEndDate()" value="{{ sub.start_date|date:"Y-m-d" }}">
+            <br>
+            <label for="clientname" style="font-size: 20px">Дата окончания</label>
+            <input required name="enddate" class="form-control form-control-lg" type="date" id="enddate" onchange="setStartDateMax()" value="{{ sub.end_date|date:"Y-m-d" }}">
+            <br>
+            <label for="clientname" style="font-size: 20px">Осталось занятий занятий</label>
+            <br>
+            <input name="col" required min="1" type="number" class="form-control form-control-lg" id="groupname" placeholder="Введите количество занятий" value="{{ sub.num_sessions }}">
+            <br>
+            
+        {% endif %}
+
+        {% if type == "single" %}
+            <h3>Абонемент на индивидуальные занятия</h3>
+            <h4>{{ client.name }} {{ client.surname }}</h4>
+            <br>
+            <label for="clientname" style="font-size: 20px">Дата начала</label>
+            <input required name="startdate" class="form-control form-control-lg" type="date" id="date" onchange="setEndDate()" value="{{ sub.start_date|date:"Y-m-d" }}">
+            <br>
+            <label for="clientname" style="font-size: 20px">Дата окончания</label>
+            <input required name="enddate" class="form-control form-control-lg" type="date" id="enddate" onchange="setStartDateMax()" value="{{ sub.end_date|date:"Y-m-d" }}">
+            <br>
+            <label for="clientname" style="font-size: 20px">Количество занятий</label>
+            <input name="col" required min="1" type="number" class="form-control form-control-lg" id="groupname" placeholder="Введите количество занятий" value="{{ sub.num_sessions }}">
+            <br>
+        
+        {% endif %}
+
+        <button type="sybmit" class="btn btn-primary btn-lg">Сохранить</button>
+        
+    </form>
+
+{% endblock %}

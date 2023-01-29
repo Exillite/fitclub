@@ -1,0 +1,23 @@
+{% extends 'fitclub/base.html' %}
+{% block content %}
+    <br>
+    <br>
+
+    <form method="post">
+        <div class="form-group">
+        <label for="groupname"><h3>Настройка параметров</h3></label>
+
+        {% for p in prms %}
+        <div class="form-group row">
+            <label for="staticEmail" class="col-sm-2 col-form-label">{{ p.title }}</label>
+            <div class="col-sm-10">
+              <input name="param_{{ p.pk }}" type="number" min="0.01" step="0.01" class="form-control" id="staticEmail" value="{{ p.value|stringformat:".2f" }}">
+            </div>
+          </div>
+        {% endfor %}
+
+        </div>
+        <button type="submit" class="btn-block btn-lg btn-primary">Сохранить</button>
+    </form>
+
+{% endblock %}

@@ -3,7 +3,13 @@
     <form action="get">
         <label for="clientname" style="font-size: 20px">Месяц</label>
         <input required name="date" class="form-control form-control-lg" type="month" value="{{ ym }}" id="date" onchange="window.location.href = `/selary/${this.value.split('-')[1]}/${this.value.split('-')[0]}/`">  
-        
+        <br>
+        <select required name="role" id="trener" class="form-control" style="font-size: 20px" onchange="window.location.href = `/selary/{{ m }}/{{ y }}/${this.value}`">
+            <option {% if type == "all" %}selected{% endif %} value="all">Все</option>
+            <option {% if type == "admin" %}selected{% endif %} value="admin">Администратор</option>
+            <option {% if type == "trener" %}selected{% endif %} value="trener">Тренер</option>
+            <option {% if type == "masager" %}selected{% endif %} value="masager">Массажист</option>
+        </select>
 
         {% if pr %}
         

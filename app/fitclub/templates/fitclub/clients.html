@@ -3,6 +3,10 @@
     <button type="button" class="btn btn-primary btn-sm float-right" onclick="window.location = {% url 'newclient' %};">Зарегестрировать</button>
     <br><br>
     <form action="get">
+        <form>
+            <input type="text" class="form-control" id="search-input" placeholder="Поиск" onkeyup="searchTable()">
+        </form>
+        <br>
         <table class="table">
             <thead>
             <tr>
@@ -24,5 +28,31 @@
             </tbody>
         </table>
     </form>
+
+    <script>
+        function searchTable() {
+          // Get the search query
+          var input = document.getElementById("search-input");
+          var filter = input.value.toUpperCase();
+      
+          // Get the table
+          var table = document.getElementsByTagName("table")[0];
+      
+          // Get the table rows
+          var tr = table.getElementsByTagName("tr");
+      
+          // Loop through the rows and hide those that don't match the search query
+          for (var i = 0; i < tr.length; i++) {
+            var td = tr[i].getElementsByTagName("td")[0];  // [0] is used to get the first cell in the row
+            if (td) {
+              if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+              } else {
+                tr[i].style.display = "none";
+              }
+            }
+          }
+        }
+      </script>
 
 {% endblock %}

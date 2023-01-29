@@ -72,11 +72,11 @@ class PeymentAdmin(admin.ModelAdmin):
         if obj.pay_type == "one":
             return "Индивидуальное занятие"
         elif obj.pay_type == "one_month":
-            return "Абонимент на индивидуальное занятие"
+            return "Абонемент на индивидуальное занятие"
         elif obj.pay_type == "group":
             return "Групповое занятие"
         elif obj.pay_type == "group_month":
-            return "Абонимент на групповые занятия"
+            return "Абонемент на групповые занятия"
         
     def way_view(self, obj):
         if obj.way == "card":
@@ -123,3 +123,7 @@ admin.site.register(Peyment, PeymentAdmin)
 admin.site.register(Spending, SpendingAdmin)
 admin.site.register(Salary, SalaryAdmin)
 admin.site.register(Income, IncomeAdmin)
+admin.site.register(SingleTren)
+admin.site.register(Subscription)
+admin.site.register(Massage)
+admin.site.register(MassageTypes)
