@@ -44,5 +44,6 @@ urlpatterns = [
     path( 'params/',                                 params,           name='params'       ),
     path( 'massagetypes/',                           massagetypes,     name='massagetypes' ),
     path( 'mastpedit/<int:id>',                      mastpedit,        name='mastpedit'    ),
-    path( 'newmastp/',                               mastpnew,        name='newmastp'     ),
+    path( 'newmastp/',                               mastpnew,         name='newmastp'     ),
+    path( 'guide/',                                  guide,            name='guide'        ),
 ]

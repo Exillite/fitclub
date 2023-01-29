@@ -1702,3 +1702,10 @@ def mastpedit(request, id):
     
     tp = MassageTypes.objects.get(pk=id)
     return render(request=request, template_name="fitclub/mastpedit.html", context={'tp': tp})
+
+
+def guide(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    return render(request=request, template_name="fitclub/guide.html", context={})
