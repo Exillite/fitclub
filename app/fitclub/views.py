@@ -843,7 +843,9 @@ def calendar(request, date='today', view='month'):
         date = datetime.date.today().strftime("%Y-%m-%d")
 
     dt = date.split('-')
-    dt[1] = str(int(dt[1]) - 1)
+    
+    if len(dt[1]) == 1:
+        dt[1] = '0' + dt[1]
 
     return render(request=request, template_name="fitclub/cal.html", context={'trenings': trenings, 'view': view, 'date': dt})
 
