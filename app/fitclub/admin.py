@@ -109,6 +109,9 @@ class IncomeAdmin(admin.ModelAdmin):
     list_display_links = ('date', 'key')
     search_fields = ('key', 'value')
 
+    
+class ZalAdmin(admin.ModelAdmin):
+    list_display = ('title',)
 
 
 admin.site.site_title = 'Админ-панель'
@@ -127,3 +130,4 @@ admin.site.register(SingleTren)
 admin.site.register(Subscription)
 admin.site.register(Massage)
 admin.site.register(MassageTypes)
+admin.site.register(Zal, ZalAdmin)

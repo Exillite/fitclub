@@ -19,6 +19,14 @@
 <br>
 <input required name="date" class="form-control form-control-lg" type="date" value="{{ ym|date:"Y-m-d" }}" id="date">
 <br>
+<select name="zal" id="zal" class="custom-select custom-select-lg">
+  <option selected selected disabled value>-- выберите зал --</option>
+  <option value="none">---</option>
+  {% for z in zals %}
+  <option value="{{ z.pk }}">{{ z.title }}</option>
+  {% endfor %}
+</select>
+<br><br>
 <button type="submit" class="btn-block btn-lg btn-primary">Сохранить</button>
 </form>
 

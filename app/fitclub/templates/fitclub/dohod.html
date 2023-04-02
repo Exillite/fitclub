@@ -1,6 +1,26 @@
 {% extends 'fitclub/base.html' %}
 {% block content %}
     <form action="get">
+        <a class="badge badge-primary" href="{% url 'dohod' %}">
+            
+            {% if not zal %}
+            <u>Общая</u>
+            {% else %}
+            Общая
+            {% endif %}
+            </a>
+        {% for z in zals %}
+        <a class="badge badge-info" href="{% url 'zdohod' z.pk %}">
+            
+            
+            {% if zal.pk == z.pk %}
+            <u>{{ z.title }}</u>
+            {% else %}
+            {{ z.title }}
+            {% endif %}
+            </a>
+        {% endfor %}
+
         <div class="dropdown">
             <button class="btn btn-info dropdown-toggle float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" style="margin-bottom: 5px; margin-left: auto;" aria-expanded="false">
               Просмотр статистики
@@ -17,6 +37,11 @@
         <h4>Расходы: {{ outs|stringformat:".2f" }}</h4>
         <h4>Прибыль: {{ prib|stringformat:".2f" }}</h4>
         <br>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="{% url 'prdohod' "day" day %}">За день</a>
+            <a class="dropdown-item" href="{% url 'prdohod' "week" week %}">За неделю</a>
+            <a class="dropdown-item" href="{% url 'prdohod' "month" month %}">За месяц</a>
+        </div>
         <h4>Расходы</h4>
         <table class="table">
             <thead>

@@ -924,11 +924,18 @@ def new_pay(request, type, client_id):
     client = Client.objects.get(pk=client_id)
     if request.method == "POST":
         data = request.POST
+        
+        zal = None
+        if 'zal' in data:
+            zal_pk = data['zal']
+            if zal_pk != 'none':
+                zal = Zal.objects.get(pk=int(zal_pk))
 
         if type.split('-')[0] == "massage":
         
             col = int(data["col"])
             price = data["price"]
+            
             mt = MassageTypes.objects.get(pk=int(type.split('-')[1]))
             for _ in range(col):
                 way = "card"
@@ -938,8 +945,7 @@ def new_pay(request, type, client_id):
                     way = "site"
 
                 date = datetime.date(*(map(int, data['date'].split('-'))))
-
-                pay = Peyment(client=client, way=way, pay_type=f"massage_{mt.pk}", date=date, value=price)
+                pay = Peyment(client=client, way=way, pay_type=f"massage_{mt.pk}", date=date, value=price, zal=zal)
                 pay.save()
                 
 
@@ -950,7 +956,6 @@ def new_pay(request, type, client_id):
                 else:
                     sgtren = Massage(client=client, pay=pay, trening=None)
                     sgtren.save()
-
             return redirect('client', id=client_id)
         
         if type == "one":
@@ -966,7 +971,7 @@ def new_pay(request, type, client_id):
 
                 date = datetime.date(*(map(int, data['date'].split('-'))))
 
-                pay = Peyment(client=client, way=way, pay_type="one", date=date, value=price)
+                pay = Peyment(client=client, way=way, pay_type="one", date=date, value=price, zal=zal)
                 pay.save()
                 
                 
@@ -990,7 +995,7 @@ def new_pay(request, type, client_id):
 
             date = datetime.date(*(map(int, data['date'].split('-'))))
 
-            pay = Peyment(client=client, way=way, pay_type="one_month", date=date, value=data['price'])
+            pay = Peyment(client=client, way=way, pay_type="one_month", date=date, value=data['price'], zal=zal)
             pay.save()
             
             
@@ -1030,7 +1035,7 @@ def new_pay(request, type, client_id):
                     way = "site"
 
                 date = datetime.date(*(map(int, data['date'].split('-'))))
-                pay = Peyment(client=client, way=way, pay_type="group", group=None, date=date, value=price)
+                pay = Peyment(client=client, way=way, pay_type="group", group=None, date=date, value=price, zal=zal)
                 pay.save()
                 
                 notpayd = SingleTren.objects.filter(client=client, pay__isnull=True, trening__trening_type='group').order_by('trening__day').first()
@@ -1051,7 +1056,7 @@ def new_pay(request, type, client_id):
                 way = "site"
             
             date = datetime.date(*(map(int, data['date'].split('-'))))
-            pay = Peyment(client=client, way=way, pay_type="group_month", group=None, date=date, value=data['price'])
+            pay = Peyment(client=client, way=way, pay_type="group_month", group=None, date=date, value=data['price'], zal=zal)
             pay.save()
             
             
@@ -1081,25 +1086,26 @@ def new_pay(request, type, client_id):
             return redirect('client', id=client_id)
 
     percent = Param.objects.get(key="site_pay_percent")
+    zals = list(Zal.objects.all())
     if type == "one":
         price = Param.objects.get(key="prise_one")
 
-        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price, 'percent': percent.value})
+        return render(request=request, template_name="fitclub/new_pay.html", context={'zals': zals, 'client': client, 'type': type, 'price': price, 'percent': percent.value})
     
     if type == "one_month":
         price = Param.objects.get(key="price_one_month")
 
-        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price, 'percent': percent.value})
+        return render(request=request, template_name="fitclub/new_pay.html", context={'zals': zals, 'client': client, 'type': type, 'price': price, 'percent': percent.value})
     
     if type == "group":
         price = Param.objects.get(key="price_group")
 
-        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price, 'groups': client.groups.all(), 'percent': percent.value})
+        return render(request=request, template_name="fitclub/new_pay.html", context={'zals': zals, 'client': client, 'type': type, 'price': price, 'groups': client.groups.all(), 'percent': percent.value})
     
     if type == "group_month":
         price = Param.objects.get(key="price_group_month")
 
-        return render(request=request, template_name="fitclub/new_pay.html", context={'client': client, 'type': type, 'price': price, 'groups': client.groups.all(), 'percent': percent.value})
+        return render(request=request, template_name="fitclub/new_pay.html", context={'zals': zals, 'client': client, 'type': type, 'price': price, 'groups': client.groups.all(), 'percent': percent.value})
 
     if type.split('-')[0] == "massage":
         
@@ -1108,7 +1114,7 @@ def new_pay(request, type, client_id):
 
         title = "Массаж - " + massage_type.title
 
-        return render(request=request, template_name="fitclub/new_pay.html", context={'title': title, 'mt': massage_type, 'client': client, 'type': 'massage', 'price': price, 'groups': client.groups.all(), 'percent': percent.value})
+        return render(request=request, template_name="fitclub/new_pay.html", context={'zals': zals, 'title': title, 'mt': massage_type, 'client': client, 'type': 'massage', 'price': price, 'groups': client.groups.all(), 'percent': percent.value})
 
 
 def allselary(request, type="all"):
@@ -1220,9 +1226,15 @@ def new_selary(request, id):
         data = request.POST
         col = data['col']
         
-        selr = Salary(user=userr, date=datetime.date.today(), give=col, accure=-1)
+        zal = None
+        if 'zal' in data:
+            zal_pk = data['zal']
+            if zal_pk != 'none':
+                zal = Zal.objects.get(pk=int(zal_pk))
+        
+        selr = Salary(user=userr, date=datetime.date.today(), give=col, accure=-1, zal=zal)
         selr.save()  
-        return redirect('selary')   
+        return redirect('selary')
 
     slrsum = None
     admsl = AdminSalary.objects.filter(user=userr).first()
@@ -1260,7 +1272,9 @@ def new_selary(request, id):
         
         slrsum = prib * admsl.value / 100
 
-    return render(request=request, template_name="fitclub/newsalary.html", context={'user': userr, 'admsl': admsl, 'slrsum': slrsum})
+    
+    zals = list(Zal.objects.all())
+    return render(request=request, template_name="fitclub/newsalary.html", context={'zals': zals, 'user': userr, 'admsl': admsl, 'slrsum': slrsum})
 
 
 def allprselary(request, month, year):
@@ -1337,6 +1351,9 @@ def prselary(request, type, month, year):
 def dohod(request):
     if not request.user.is_authenticated:
         return redirect('login')
+    
+    zals = list(Zal.objects.all())
+    
     year = datetime.date.today().year
     month = datetime.date.today().month
     day = datetime.date.today().day
@@ -1366,7 +1383,46 @@ def dohod(request):
     for inc in incomes:
         ins += inc.value
     
-    return render(request=request, template_name="fitclub/dohod.html", context={'incomes': incomes, 'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': f"{year}-{month}", 'day': f"{year}-{month}-{day}", 'week': f"{year}-W{week}", 'month': f"{year}-{month}"})
+    return render(request=request, template_name="fitclub/dohod.html", context={'zals': zals, 'incomes': incomes, 'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': f"{year}-{month}", 'day': f"{year}-{month}-{day}", 'week': f"{year}-W{week}", 'month': f"{year}-{month}"})
+
+
+def zdohod(request, z):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    zal = Zal.objects.filter(pk=z).first()
+    
+    zals = list(Zal.objects.all())
+    
+    year = datetime.date.today().year
+    month = datetime.date.today().month
+    day = datetime.date.today().day
+    week = datetime.date.today().isocalendar().week
+    
+    ins = 0
+    pays = Peyment.objects.filter(date__year=str(year), date__month=str(month), zal=zal)
+    for p in pays:
+        ins += p.value
+    
+    User = get_user_model()
+    users = User.objects.filter(
+    groups__name__in=['trener', 'admin', 'masager'])
+    zp = 0
+    for user in users:
+        selrs = Salary.objects.filter(user=user, date__year=str(year), date__month=str(month), zal=zal)
+        for sl in selrs:
+            zp += sl.give
+    
+    spnd = 0
+    spendings = Spending.objects.filter(date__year=str(year), date__month=str(month), zal=zal).order_by('-date')
+    for s in spendings:
+        spnd += s.value
+    
+    
+    incomes = Income.objects.filter(date__year=str(year), date__month=str(month), zal=zal).order_by('-date')
+    for inc in incomes:
+        ins += inc.value
+    
+    return render(request=request, template_name="fitclub/dohod.html", context={'zal': zal,'zals': zals, 'zal_id': z,'incomes': incomes, 'ins': ins, 'outs': zp + spnd, 'prib': ins - (zp+spnd), 'zp': zp, 'spends': spendings, 'ym': f"{year}-{month}", 'day': f"{year}-{month}-{day}", 'week': f"{year}-W{week}", 'month': f"{year}-{month}"})
 
 
 def prdohod(request, type, date):
@@ -1467,14 +1523,20 @@ def new_spend(request):
         
         dt = datetime.date(*(map(int, data['date'].split('-'))))
         
-        spend = Spending(key=data['name'], value=int(data['col']), spend_type="default", date=dt)
+        zal = None
+        if 'zal' in data:
+            zal_pk = data['zal']
+            if zal_pk != 'none':
+                zal = Zal.objects.get(pk=int(zal_pk))
+        
+        spend = Spending(key=data['name'], value=int(data['col']), spend_type="default", date=dt, zal=zal)
         spend.save()
         
         return redirect('dohod')
 
     td = datetime.date.today()
-
-    return render(request=request, template_name="fitclub/newspend.html", context={'ym': td})
+    zals = list(Zal.objects.all())
+    return render(request=request, template_name="fitclub/newspend.html", context={'zals': zals, 'ym': td})
 
 
 @csrf_exempt
@@ -1506,14 +1568,21 @@ def new_income(request):
         
         dt = datetime.date(*(map(int, data['date'].split('-'))))
         
-        income = Income(key=data['name'], value=int(data['col']), date=dt)
+        zal = None
+        if 'zal' in data:
+            zal_pk = data['zal']
+            if zal_pk != 'none':
+                zal = Zal.objects.get(pk=int(zal_pk))
+        income = Income(key=data['name'], value=int(data['col']), date=dt, zal=zal)
         income.save()
         
         return redirect('dohod')
 
     td = datetime.date.today()
+    
+    zals = list(Zal.objects.all())
 
-    return render(request=request, template_name="fitclub/newspend.html", context={'ym': td, 'inc': True})
+    return render(request=request, template_name="fitclub/newspend.html", context={'zals': zals, 'ym': td, 'inc': True})
 
 
 @csrf_exempt

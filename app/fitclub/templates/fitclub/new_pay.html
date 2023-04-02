@@ -22,7 +22,14 @@
                 <option value="card">Карта</option>
             </select>
             <br><br>
-            
+            <select name="zal" id="zal" class="custom-select custom-select-lg">
+                <option selected selected disabled value>-- выберите зал --</option>
+                <option value="none">---</option>
+                {% for z in zals %}
+                <option value="{{ z.pk }}">{{ z.title }}</option>
+                {% endfor %}
+            </select>
+            <br><br>
             <input name="price" required type="number" class="form-control form-control-lg" id="pricefield" placeholder="Введите сумму" value="{{ price|stringformat:".2f" }}">
         {% endif %}
 
@@ -44,7 +51,17 @@
                 <option value="site">Через сайт</option>
             </select>
             <br><br>
-            
+
+            <select name="zal" id="zal" class="custom-select custom-select-lg">
+               <option selected selected disabled value>-- выберите зал --</option>
+               <option value="none">---</option>
+               {% for z in zals %}
+               <option value="{{ z.pk }}">{{ z.title }}</option>
+               {% endfor %}
+           </select>
+           <br><br>
+           
+
             <input name="price" required type="number" class="form-control form-control-lg" id="pricefield" placeholder="Введите сумму" value="{{ price.value|stringformat:".2f" }}">
         {% endif %}
         
@@ -71,6 +88,15 @@
                 <option value="site">Через сайт</option>
             </select>
             <br><br>
+            <select name="zal" id="zal" class="custom-select custom-select-lg">
+                <option selected selected disabled value>-- выберите зал --</option>
+                <option value="none">---</option>
+                {% for z in zals %}
+                <option value="{{ z.pk }}">{{ z.title }}</option>
+                {% endfor %}
+            </select>
+            <br><br>
+            
             <input name="price"  min="1" step="0.01" required type="number" class="form-control form-control-lg" id="pricefield" placeholder="Введите сумму" value="{{ price.value|stringformat:".2f" }}">
         {% endif %}
 
@@ -89,6 +115,14 @@
                 <option value="money">Наличные</option>
                 <option value="card">Карта</option>
                 <option value="site">Через сайт</option>
+            </select>
+            <br><br>
+            <select name="zal" id="zal" class="custom-select custom-select-lg">
+                <option selected selected disabled value>-- выберите зал --</option>
+                <option value="none">---</option>
+                {% for z in zals %}
+                <option value="{{ z.pk }}">{{ z.title }}</option>
+                {% endfor %}
             </select>
             <br><br>
             <input name="price" required type="number" class="form-control form-control-lg" id="pricefield" placeholder="Введите сумму" value="{{ price.value|stringformat:".2f" }}">
@@ -117,6 +151,14 @@
                 <option value="money">Наличные</option>
                 <option value="card">Карта</option>
                 <option value="site">Через сайт</option>
+            </select>
+            <br><br>
+            <select name="zal" id="zal" class="custom-select custom-select-lg">
+                <option selected selected disabled value>-- выберите зал --</option>
+                <option value="none">---</option>
+                {% for z in zals %}
+                <option value="{{ z.pk }}">{{ z.title }}</option>
+                {% endfor %}
             </select>
             <br><br>
             <input name="price" min="1" required type="number" class="form-control form-control-lg" id="pricefield" placeholder="Введите сумму" value="{{ price.value|stringformat:".2f" }}">

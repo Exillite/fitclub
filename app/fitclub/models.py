@@ -129,6 +129,7 @@ class Peyment(models.Model):
     pay_type = models.CharField(max_length=150, verbose_name="Тип оплаты")
     date = models.DateField(null=True, blank=True, verbose_name="Дата") 
     value = models.FloatField(verbose_name="Сумма")
+    zal = models.ForeignKey('Zal', on_delete=models.PROTECT, verbose_name="Зал", blank=True, null=True, default=None)
 
     class Meta:
         verbose_name = 'Платёж'
@@ -154,6 +155,7 @@ class Spending(models.Model):
     value = models.FloatField(verbose_name="Сумма")
     spend_type = models.CharField(max_length=150, verbose_name="Тип")
     date = models.DateField(null=True, blank=True, verbose_name="Дата")
+    zal = models.ForeignKey('Zal', on_delete=models.PROTECT, verbose_name="Зал", blank=True, null=True, default=None)
     
     class Meta:
         verbose_name = 'Расход'
@@ -174,6 +176,7 @@ class Salary(models.Model):
     date = models.DateField(verbose_name="Дата")
     accure = models.FloatField(blank=True)
     give = models.FloatField(verbose_name="Выплачено")
+    zal = models.ForeignKey('Zal', on_delete=models.PROTECT, verbose_name="Зал", blank=True, null=True, default=None)
     
     class Meta:
         verbose_name = 'Выплата'
@@ -187,6 +190,7 @@ class Income(models.Model):
     key = models.CharField(max_length=255, verbose_name="Описание")
     value = models.FloatField(verbose_name="Сумма")
     date = models.DateField(null=True, blank=True, verbose_name="Дата")
+    zal = models.ForeignKey('Zal', on_delete=models.PROTECT, verbose_name="Зал", blank=True, null=True, default=None)
     
     class Meta:
         verbose_name = 'Доход'
@@ -257,3 +261,11 @@ class AdminSalary(models.Model):
     class Meta:
         verbose_name = 'Зарплата администратора'
         verbose_name_plural = 'Зарплаты администраторов'
+
+
+class Zal(models.Model):
+    title = models.CharField(max_length=255, verbose_name="Название зала")
+    
+    class Meta:
+        verbose_name = "Зал"
+        verbose_name_plural = "Залы"
