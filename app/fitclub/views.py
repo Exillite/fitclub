@@ -265,9 +265,23 @@ def admin_groups(request):
     if not request.user.is_authenticated:
         return redirect('login')
     
-    groups = SportGroup.objects.all()
+    
+    zals = Zal.objects.all()
+    
+    zals_list = []
+    
+    for zal in zals:
+        groups = SportGroup.objects.filter(zal=zal)
+        
+        groups_list = []
 
-    return render(request=request, template_name="fitclub/groups.html", context={'groups': groups})
+        for group in groups:
+            groups_list.append([group, Client.objects.filter(groups=group.pk).count()])
+    
+        zals_list.append([zal, groups_list.copy()])
+            
+    
+    return render(request=request, template_name="fitclub/groups.html", context={'groups': zals_list })
 
 @csrf_exempt
 def add_group(request):
@@ -276,12 +290,15 @@ def add_group(request):
     if request.method == "POST":
         data = request.POST
         group_name = data.get("groupname")
+        zal = Zal.objects.get(pk=int(data.get("zal")))
+        age = data.get("age")
         
-        sport_group = SportGroup(name=group_name)
+        sport_group = SportGroup(name=group_name, zal=zal, age=age)
         sport_group.save()
         return redirect('groups')
 
-    return render(request=request, template_name="fitclub/addgroup.html")
+    zals = Zal.objects.all()
+    return render(request=request, template_name="fitclub/addgroup.html", context={'zals': zals})
 
 @csrf_exempt
 def group_info(request, id):
@@ -306,6 +323,16 @@ def group_info(request, id):
                 group.trener = new_trener
 
         group_name = data.get("groupname")
+        
+        zal = Zal.objects.get(pk=int(data.get("zal")))
+
+        group.zal = zal
+        
+        age = data.get("age")
+        group.age = age
+        
+        wcount = data.get("wcount")
+        group.wcount = wcount
 
         if group.name != group_name:
             group.name = group_name
@@ -336,8 +363,10 @@ def group_info(request, id):
         days.append((DAYS[time.day], time))
 
     trenings = Trening.objects.filter(group=group).order_by('-day', '-start')
+    
+    zals = Zal.objects.all()
 
-    return render(request=request, template_name="fitclub/group.html", context={'group': group, 'treners': tereners, 'clients': clients, 'days': days, 'trenings':trenings})
+    return render(request=request, template_name="fitclub/group.html", context={'group': group, 'treners': tereners, 'clients': clients, 'days': days, 'trenings':trenings, 'zals': zals})
 
 
 def admin_clients(request):

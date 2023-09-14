@@ -1,14 +1,28 @@
-{% extends 'fitclub/base.html' %}
-{% block content %}
-    <br>
-    <br>
+{% extends 'fitclub/base.html' %} {% block content %}
+<br>
+<br>
 
-    <form method="post">
-        <div class="form-group">
-          <label for="groupname"><h3>Новая группа</h3></label>
-          <input name="groupname" required type="text" class="form-control form-control-lg" id="groupname" placeholder="Введите название группы">
-        </div>
-        <button type="submit" class="btn-block btn-lg btn-primary">Создать</button>
-    </form>
+<form method="post">
+    <div class="form-group">
+        <label for="groupname"><h3>Новая группа</h3></label>
+
+        <input name="groupname" required type="text" class="form-control form-control-lg" id="groupname" placeholder="Введите название группы">
+
+        <br><br>
+        <select name="zal" id="zal" class="custom-select custom-select-lg">
+          <option selected disabled value>-- Выберите зал --</option>
+          <option value="none">---</option>
+          {% for z in zals %}
+          <option value="{{ z.pk }}">{{ z.title }}</option>
+          {% endfor %}
+        </select>
+
+        <br><br>
+        <input name="age" required type="text" class="form-control form-control-lg" id="age" placeholder="Введите возраст группы">
+
+
+    </div>
+    <button type="submit" class="btn-block btn-lg btn-primary">Создать</button>
+</form>
 
 {% endblock %}

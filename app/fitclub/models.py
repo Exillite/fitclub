@@ -10,6 +10,9 @@ class SportGroup(models.Model):
         null=True,
         verbose_name="Тренер"
     )
+    zal = models.ForeignKey('Zal', on_delete=models.SET_NULL, null=True, verbose_name="Группа", default=None)
+    age = models.CharField(max_length=255, verbose_name="Возраст", null=True, default=None)
+    wcount = models.IntegerField(verbose_name="Желаемое кол. участников", null=True, default=None)
     
     class Meta:
         verbose_name = 'Группа'
