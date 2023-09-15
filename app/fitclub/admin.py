@@ -6,7 +6,10 @@ class SportGroupAdmin(admin.ModelAdmin):
     list_filter = ('trener',)
     search_fields = ('name',)
     def user_view(self, obj):
-        return f"{obj.trener.first_name} {obj.trener.last_name}"
+        if obj.trener:
+            return f"{obj.trener.first_name} {obj.trener.last_name}"
+        else:
+            return "Тренер не указан"
 
     user_view.short_description = "Тренер"
 
