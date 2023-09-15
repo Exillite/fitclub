@@ -9,7 +9,7 @@
         <input name="groupname" required type="text" class="form-control form-control-lg" id="groupname" placeholder="Введите название группы">
 
         <br><br>
-        <select name="zal" id="zal" class="custom-select custom-select-lg">
+        <select required name="zal" id="zal" class="custom-select custom-select-lg">
           <option selected disabled value>-- Выберите зал --</option>
           {% for z in zals %}
           <option value="{{ z.pk }}">{{ z.title }}</option>
