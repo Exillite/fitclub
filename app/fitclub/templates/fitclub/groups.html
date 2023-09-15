@@ -29,7 +29,7 @@
                 <td>{{ group.0.name }}</td>
                 <td>{{ group.0.trener.last_name }} {{ group.trener.first_name|make_list|first }}.</td>
                 <td>{{ group.1 }}</td>
-                <td>{{ group.0.wcount }}</td>
+                <td> {% if group.0.wcount %} {{ group.0.wcount }} {% else %} - {% endif %}</td>
 
                 <td><a href="{% url 'group' group.0.pk %}" class="btn-sm btn-primary" role="button">Редактировать</a></td>
             </tr>
