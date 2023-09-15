@@ -31,7 +31,7 @@
                 <td>{{ group.1 }}</td>
                 <td>{{ group.0.wcount }}</td>
 
-                <td><a href="{% url 'group' group.pk %}" class="btn-sm btn-primary" role="button">Редактировать</a></td>
+                <td><a href="{% url 'group' group.0.pk %}" class="btn-sm btn-primary" role="button">Редактировать</a></td>
             </tr>
             {% endfor %}
             {% endfor %}
