@@ -11,7 +11,6 @@
         <br><br>
         <select name="zal" id="zal" class="custom-select custom-select-lg">
           <option selected disabled value>-- Выберите зал --</option>
-          <option value="none">---</option>
           {% for z in zals %}
           <option value="{{ z.pk }}">{{ z.title }}</option>
           {% endfor %}

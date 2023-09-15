@@ -84,10 +84,10 @@
             <input name="groupname" type="text" class="form-control form-control-lg" id="groupname" value="{{ group.name }}">
             
 
-            <br><br>
+            <br>
+            <label for="age">Зал</label>
             <select name="zal" id="zal" class="custom-select custom-select-lg">
                 <option {% if not zal %} selected {% endif %} disabled value>-- Выберите зал --</option>
-                <option value="none">---</option>
                 {% for z in zals %}
                 <option {% if zal.pk == group.zal.pk %} selected {% endif %} value="{{ z.pk }}">{{ z.title }}</option>
                 {% endfor %}
