@@ -332,7 +332,8 @@ def group_info(request, id):
         group.age = age
         
         wcount = data.get("wcount")
-        group.wcount = wcount
+        if wcount != '':
+            group.wcount = int(wcount)
 
         if group.name != group_name:
             group.name = group_name
