@@ -89,7 +89,7 @@
             <select required name="zal" id="zal" class="custom-select custom-select-lg">
                 <option {% if not zal %} selected {% endif %} disabled value>-- Выберите зал --</option>
                 {% for z in zals %}
-                <option {% if zal.pk == group.zal.pk %} selected {% endif %} value="{{ z.pk }}">{{ z.title }}</option>
+                <option {% if z.pk == group.zal.pk %} selected {% endif %} value="{{ z.pk }}">{{ z.title }}</option>
                 {% endfor %}
             </select>
             <br><br>
