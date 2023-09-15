@@ -11,6 +11,7 @@
                 <th class="w-25" scope="col">Название группы</th>
                 <th class="w-25" scope="col">Тренер</th>
                 <th class="w-25" scope="col">ЧЕЛ</th>
+                <th class="w-25" scope="col">Возраст</th>
                 <th class="w-25" scope="col">ЖЕЛ</th>
 
                 <th scope="col">Редактировать</th>
@@ -22,13 +23,14 @@
             <tbody>
             {% for zal in groups %}
             <tr class="table-active">
-                <td align="center" colspan="5">{{ zal.0.title }}</td>
+                <td align="center" colspan="6">{{ zal.0.title }}</td>
             </tr>
             {% for group in zal.1 %}
             <tr>
                 <td>{{ group.0.name }}</td>
                 <td>{{ group.0.trener.last_name }} {{ group.trener.first_name|make_list|first }}.</td>
                 <td>{{ group.1 }}</td>
+                <td>{{ group.0.age }}</td>
                 <td> {% if group.0.wcount %} {{ group.0.wcount }} {% else %} - {% endif %}</td>
 
                 <td><a href="{% url 'group' group.0.pk %}" class="btn-sm btn-primary" role="button">Редактировать</a></td>

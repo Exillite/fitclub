@@ -95,11 +95,11 @@
             <br><br>
             
             <label for="age">Возраст группы</label>
-            <input name="age" required type="text" class="form-control form-control-lg" id="age" placeholder="Введите возраст группы" value="{{ group.age }}">
+            <input name="age" type="text" class="form-control form-control-lg" id="age" placeholder="Введите возраст группы" value="{{ group.age }}">
             
             <br>
             <label for="wcount">Желаемое кол. участников</label>
-            <input name="wcount" required type="number" class="form-control form-control-lg" id="wcount" placeholder="Введите желаемое кол. участников" value="{{ group.wcount }}">
+            <input name="wcount" type="number" class="form-control form-control-lg" id="wcount" placeholder="Введите желаемое кол. участников" value="{{ group.wcount }}">
 
             <br>
             <a href="{% url 'weekplan' %}" class="btn btn-sm btn-info">Открыть расписание</a>
